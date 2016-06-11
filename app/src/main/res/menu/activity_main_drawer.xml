@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@id/menu_navigation_rooms_load"
+            android:icon="@drawable/ic_assessment_black_24dp"
+            android:title="@string/menu_navigation_rooms_load" />
+        <item
+            android:id="@id/menu_navigation_users"
+            android:icon="@drawable/ic_account_box_black_24dp"
+            android:title="@string/menu_navigation_users" />
+        <item
+            android:id="@id/menu_navigation_journal"
+            android:icon="@drawable/ic_view_list_black_24dp"
+            android:title="@string/menu_navigation_journal" />
+        <item
+            android:id="@id/menu_navigation_settings"
+            android:icon="@drawable/ic_settings_applications_black_24dp"
+            android:title="@string/menu_navigation_settings" />
+    </group>
+
+</menu>

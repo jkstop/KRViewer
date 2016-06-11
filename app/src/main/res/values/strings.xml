@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">KR Viewer</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="menu_navigation_rooms_load">Загруженность помещений</string>
+    <string name="menu_navigation_users">Пользователи</string>
+    <string name="menu_navigation_journal">Журнал</string>
+    <string name="menu_navigation_settings">Настройки</string>
+</resources>
