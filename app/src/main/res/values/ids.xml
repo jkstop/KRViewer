@@ -7,8 +7,14 @@
     <item name="main_navigation_drawer" type="id"/>
     <item name="main_navigation_view" type="id"/>
 
+    <item name="account_image" type="id"/>
+    <item name="account_name" type="id"/>
+    <item name="account_email" type="id"/>
+
     <item name="menu_navigation_rooms_load" type="id"/>
     <item name="menu_navigation_users" type="id"/>
     <item name="menu_navigation_journal" type="id"/>
     <item name="menu_navigation_settings" type="id"/>
+
+    <item name="main_fragment_frame" type="id"/>
 </resources>
