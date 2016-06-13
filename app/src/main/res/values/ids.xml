@@ -14,7 +14,8 @@
     <item name="menu_navigation_rooms_load" type="id"/>
     <item name="menu_navigation_users" type="id"/>
     <item name="menu_navigation_journal" type="id"/>
-    <item name="menu_navigation_settings" type="id"/>
+    <item name="menu_main_server_status" type="id"/>
 
     <item name="main_fragment_frame" type="id"/>
+    <item name="main_recycler" type="id"/>
 </resources>

@@ -14,10 +14,6 @@
             android:id="@id/menu_navigation_journal"
             android:icon="@drawable/ic_view_list_black_24dp"
             android:title="@string/menu_navigation_journal" />
-        <item
-            android:id="@id/menu_navigation_settings"
-            android:icon="@drawable/ic_settings_applications_black_24dp"
-            android:title="@string/menu_navigation_settings" />
     </group>
 
 </menu>
