@@ -10,6 +10,7 @@
     <item name="account_image" type="id"/>
     <item name="account_name" type="id"/>
     <item name="account_email" type="id"/>
+    <item name="account_exit" type="id"/>
 
     <item name="menu_navigation_rooms_load" type="id"/>
     <item name="menu_navigation_users" type="id"/>

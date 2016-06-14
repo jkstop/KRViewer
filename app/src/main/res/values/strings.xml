@@ -4,12 +4,16 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="navigation_head_account_log_off">Вход не выполнен</string>
+    <string name="navigation_head_account_log_off">Войти</string>
 
     <string name="menu_navigation_rooms_load">Загруженность помещений</string>
     <string name="menu_navigation_users">Пользователи</string>
     <string name="menu_navigation_journal">Журнал</string>
     <string name="menu_main_server_status">MSSQL</string>
+
+    <string name="title_dialog_log_out">Выход из аккаунта</string>
+
+    <string name="body_dialog_log_out">Вы точно хотите отсоединить этот аккаунт? Все введенные данные останутся невредимы</string>
 
 
 </resources>

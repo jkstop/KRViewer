@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_number": "724754658889",
+    "project_id": "kr-viewer"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:724754658889:android:6865ae2c5dd828cd",
+        "android_client_info": {
+          "package_name": "ru.jkstop.krviewer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "724754658889-35dgvpbhbr0a4jn69h3ab1nk9tri3qk5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ru.jkstop.krviewer",
+            "certificate_hash": "0A90861AFD68EEEFFDFA17220BD90DE837328A2A"
+          }
+        },
+        {
+          "client_id": "724754658889-e1ajv52f35t6k4cguk5h5r89el44lsv2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ru.jkstop.krviewer",
+            "certificate_hash": "2245A60DF63C35E1CCD9616A28E7D661463163FF"
+          }
+        },
+        {
+          "client_id": "724754658889-rntbh12ec7pne9kog9b4gkrebhtlvm5h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD37Rik7BXpEdJBfKvgpzqLVLLRe7QP7MM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

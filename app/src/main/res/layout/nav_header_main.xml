@@ -12,26 +12,45 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
-    <android.support.v7.widget.AppCompatImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@id/account_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
-        app:srcCompat="@drawable/ic_account_circle_white_48dp" />
+        android:src="@drawable/ic_account_circle_white_48dp" />
 
-    <TextView
-        android:id="@id/account_name"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:text="@string/navigation_head_account_log_off"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title" />
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@id/account_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@id/account_exit"
+            android:paddingTop="@dimen/nav_header_vertical_spacing"
+            android:text="@string/navigation_head_account_log_off"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@id/account_exit"
+            app:srcCompat="@drawable/ic_exit_to_app_white_24dp"
+            android:clickable="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignBottom="@id/account_name"
+            android:paddingStart="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </RelativeLayout>
+
+
 
     <TextView
         android:id="@id/account_email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"/>
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
 
 </LinearLayout>
