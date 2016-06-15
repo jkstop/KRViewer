@@ -3,6 +3,7 @@
 
     <item name="main_toolbar" type="id"/>
     <item name="main_fab" type="id"/>
+    <item name="main_tabs" type="id"/>
 
     <item name="main_navigation_drawer" type="id"/>
     <item name="main_navigation_view" type="id"/>
@@ -19,4 +20,16 @@
 
     <item name="main_fragment_frame" type="id"/>
     <item name="main_recycler" type="id"/>
+    <item name="main_view_pager" type="id"/>
+    <item name="main_progress_bar" type="id"/>
+
+    <item name="dialog_sql_setting_input_server" type="id"/>
+    <item name="dialog_sql_setting_status" type="id"/>
+    <item name="dialog_sql_setting_reconnect" type="id"/>
+
+    <item name="user_card" type="id"/>
+    <item name="user_card_info_layout" type="id"/>
+    <item name="user_card_initials" type="id"/>
+    <item name="user_card_division" type="id"/>
+    <item name="user_card_photo" type="id"/>
 </resources>

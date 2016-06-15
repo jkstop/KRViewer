@@ -77,13 +77,20 @@ public class ServerConnect {
         System.out.println("THREAD " + connectThread);
 
         try {
-            if (SQLconnect!=null && !SQLconnect.isClosed()){
-                callback.onServerConnected(SQLconnect, mCallingTask);
+            if (serverName == null){
+                if (SQLconnect!=null && !SQLconnect.isClosed()){
+                    callback.onServerConnected(SQLconnect, mCallingTask);
+                } else {
+                    if (connectThread == null){
+                        connectThread = new Thread(null, getConnect, "MSSQLServerConnect");
+                        mServerName = SharedPrefs.getServerName();
+
+                        connectThread.start();
+                    }
+                }
             } else {
                 if (connectThread == null){
                     connectThread = new Thread(null, getConnect, "MSSQLServerConnect");
-                    if (serverName == null) mServerName = SharedPrefs.getServerName();
-
                     connectThread.start();
                 }
             }
@@ -93,6 +100,7 @@ public class ServerConnect {
     }
 
     public static void closeConnection(){
+        System.out.println("try close connection");
         if (SQLconnect!=null){
             try {
                 SQLconnect.close();

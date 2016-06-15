@@ -9,7 +9,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,14 +21,20 @@ import ru.jkstop.krviewer.databases.UsersDB;
 import ru.jkstop.krviewer.items.User;
 
 /**
- * Фрагмент пользователи
+ * Created by ivsmirnov on 15.06.2016.
  */
-public class UsersFragment extends Fragment implements RecyclerItemClickListener{
+public class UsersPages extends Fragment implements RecyclerItemClickListener{
+
+    private static final String PAGE_NUMBER = "page_number";
+
+    public static final int PAGE_LOCAL_USERS = 0;
+    public static final int PAGE_SERVER_USERS = 1;
 
     private static final int HIDE_PROGRESS = 10;
     private static final int UPDATE_LIST = 11;
 
     private Context context;
+    private int page;
 
     private ArrayList<User> mUsersList;
     private RecyclerView mRecycler;
@@ -39,17 +44,19 @@ public class UsersFragment extends Fragment implements RecyclerItemClickListener
 
     private Handler mHandler;
 
-    public static UsersFragment newInstance(){
-        System.out.println("new users fragment");
-        return new UsersFragment();
+    public static UsersPages newInstance(int page){
+        UsersPages usersPages = new UsersPages();
+        Bundle bundle = new Bundle();
+        bundle.putInt(PAGE_NUMBER, page);
+        usersPages.setArguments(bundle);
+        return usersPages;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         context = getContext();
-
+        page = getArguments().getInt(PAGE_NUMBER);
         mUsersList = new ArrayList<>();
 
         mHandler = new Handler(Looper.getMainLooper()){
@@ -73,18 +80,25 @@ public class UsersFragment extends Fragment implements RecyclerItemClickListener
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View fragmentView = inflater.inflate(R.layout.fragment_users, container, false);
+        View fragmentView;
+        switch (page){
+            case PAGE_LOCAL_USERS:
+                fragmentView = inflater.inflate(R.layout.recycler_main, container, false);
+                mProgressBar = (ProgressBar)fragmentView.findViewById(R.id.main_progress_bar);
+                mRecycler = (RecyclerView)fragmentView.findViewById(R.id.main_recycler);
+                mAdapter = new AdapterUsersList(context, mUsersList, 0, this);
 
-        //mProgressBar = (ProgressBar)fragmentView.findViewById(R.id.main_progress_bar);
-        //mRecycler = (RecyclerView)fragmentView.findViewById(R.id.main_recycler);
-        //mAdapter = new AdapterUsersList(context, mUsersList, 0, this);
+                mRecycler.setAdapter(mAdapter);
+                mRecycler.setLayoutManager(new GridLayoutManager(context, 1));
 
-//        mRecycler.setAdapter(mAdapter);
-//        mRecycler.setLayoutManager(new GridLayoutManager(context, 1));
-
-//        loadUsersTask().start();
-
-        return fragmentView;
+                loadUsersTask().start();
+                return fragmentView;
+            case PAGE_SERVER_USERS:
+                fragmentView = inflater.inflate(R.layout.fragment_users, container, false);
+                return fragmentView;
+            default:
+                return super.onCreateView(inflater, container, savedInstanceState);
+        }
     }
 
     private void loadUsersList(){

@@ -12,8 +12,13 @@
     <string name="menu_main_server_status">MSSQL</string>
 
     <string name="title_dialog_log_out">Выход из аккаунта</string>
+    <string name="title_dialog_sql_connect">Подключение к MSSQL</string>
 
     <string name="body_dialog_log_out">Вы точно хотите отсоединить этот аккаунт? Все введенные данные останутся невредимы</string>
+
+    <string name="hint_sql_input_server_name">Сервер</string>
+
+    <string name="input_empty_error">Введите хотя бы один символ!</string>
 
 
 </resources>

@@ -7,6 +7,8 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.Image;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -14,7 +16,11 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.util.Base64;
 import android.view.MenuInflater;
 import android.view.View;
@@ -45,9 +51,11 @@ import java.io.File;
 import java.net.URL;
 import java.sql.Connection;
 
+import ru.jkstop.krviewer.adapters.ViewPagerAdapter;
 import ru.jkstop.krviewer.databases.DbShare;
 import ru.jkstop.krviewer.databases.UsersDB;
 import ru.jkstop.krviewer.dialogs.DialogLogOut;
+import ru.jkstop.krviewer.dialogs.DialogSQLSetting;
 import ru.jkstop.krviewer.items.User;
 
 public class MainActivity extends AppCompatActivity implements
@@ -57,16 +65,26 @@ public class MainActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener{
 
     private static final int SIGN_IN = 100;
-    private static final int SERVER_CONNECTED = 101;
-    private static final int SERVER_DISCONNECTED = 102;
+    public static final int SERVER_CONNECTED = 101;
+    public static final int SERVER_DISCONNECTED = 102;
+
+    private static final int COLLECTION_ROOMS = 10;
+    private static final int COLLECTION_USERS = 11;
+    private static final int COLLECTION_JOURNAL = 12;
+
 
     private Context context;
 
     private DrawerLayout drawer;
+    private ViewPager viewPager;
+    private TabLayout tabLayout;
     private FloatingActionButton mainFAB;
     private TextView accountName, accountEmail;
     private ImageView accountImage, accountExit;
     private MenuItem serverConnectStatus;
+
+    //private ViewPagerAdapter viewPagerAdapter;
+    private ViewPagerAdapter viewPagerAdapter;
 
     private static ServerConnect.Callback serverConnectionCallback;
 
@@ -90,6 +108,18 @@ public class MainActivity extends AppCompatActivity implements
 
         context = this;
         drawer = (DrawerLayout)findViewById(R.id.main_navigation_drawer);
+        viewPager = (ViewPager)findViewById(R.id.main_view_pager);
+        tabLayout = (TabLayout)findViewById(R.id.main_tabs);
+        viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        //viewPagerAdapter.addFragment(MainPages.newInstance(MainPages.PAGE_CURRENT_LOAD), getString(R.string.menu_navigation_rooms_load));
+        //viewPagerAdapter.addFragment(MainPages.newInstance(MainPages.PAGE_HISTORY), getString(R.string.menu_navigation_journal));
+
+        viewPager.setAdapter(viewPagerAdapter);
+
+        tabLayout.setupWithViewPager(viewPager);
+
+        replaceViewPagerFragments(COLLECTION_ROOMS);
+
         mainFAB = (FloatingActionButton) findViewById(R.id.main_fab);
         accountName = (TextView) navigationMenu.getHeaderView(0).findViewById(R.id.account_name);
         accountEmail = (TextView) navigationMenu.getHeaderView(0).findViewById(R.id.account_email);
@@ -114,10 +144,14 @@ public class MainActivity extends AppCompatActivity implements
                         serverConnectStatus.setIcon(R.drawable.ic_cloud_off_black_24dp);
                         break;
                     case NetworkUtil.NETWORK_STATUS_WIFI:
-                        ServerConnect.getConnection("10.38.2.6", 0, serverConnectionCallback);
+                        //WifiManager wifiManager = (WifiManager)getSystemService(WIFI_SERVICE);
+                        //WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+                        //System.out.println("wifi name " + wifiInfo.toString());
+                        //System.out.println("wifi ssid " + wifiInfo.getSSID());
+                        ServerConnect.getConnection(null, 0, serverConnectionCallback);
                         break;
                     case NetworkUtil.NETWORK_STATUS_MOBILE:
-                        serverConnectStatus.setIcon(R.drawable.ic_info_black_24dp);
+                        serverConnectStatus.setIcon(R.drawable.ic_cloud_off_black_24dp);
                         break;
                     default:
                         break;
@@ -145,7 +179,9 @@ public class MainActivity extends AppCompatActivity implements
 
         navigationMenu.setNavigationItemSelectedListener(this);
 
-        replaceFragment(LoadRoomFragment.newInstance(), getString(R.string.menu_navigation_rooms_load));
+        //replaceFragment(LoadRoomFragment.newInstance(), getString(R.string.menu_navigation_rooms_load));
+        //viewPagerAdapter.addFragment(LoadRoomFragment.newInstance(), getString(R.string.menu_navigation_rooms_load));
+       // replaceViewPagerFragments(COLLECTION_ROOMS);
     }
 
     private void initGoogleSingInAPI(){
@@ -255,31 +291,62 @@ public class MainActivity extends AppCompatActivity implements
                 .commit();
     }
 
+    private void replaceViewPagerFragments(int fragmentCollection){
+        viewPagerAdapter.clearFragments();
+        viewPagerAdapter.notifyDataSetChanged();
+        switch (fragmentCollection){
+            case COLLECTION_ROOMS:
+                viewPagerAdapter.addFragment(MainPages.newInstance(MainPages.PAGE_CURRENT_LOAD), "Текущая");
+                viewPagerAdapter.addFragment(MainPages.newInstance(MainPages.PAGE_HISTORY), "История");
+
+                //viewPagerAdapter.addFragment(LoadRoomFragment.newInstance(), getString(R.string.menu_navigation_rooms_load));
+                //viewPagerAdapter.addFragment(JournalFragment.newInstance(), getString(R.string.menu_navigation_journal));
+                break;
+            case COLLECTION_USERS:
+                viewPagerAdapter.addFragment(UsersPages.newInstance(UsersPages.PAGE_LOCAL_USERS),"Локальные");
+                viewPagerAdapter.addFragment(UsersPages.newInstance(UsersPages.PAGE_SERVER_USERS),"Серверные");
+                break;
+            case COLLECTION_JOURNAL:
+
+                break;
+            default:
+                break;
+        }
+        viewPagerAdapter.notifyDataSetChanged();
+
+    }
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
 
         switch (item.getItemId()){
             case R.id.menu_navigation_rooms_load:
-                if (getSupportFragmentManager().findFragmentByTag(getString(R.string.menu_navigation_rooms_load)) != null){
-                    break;
-                }else{
-                    replaceFragment(LoadRoomFragment.newInstance(), getString(R.string.menu_navigation_rooms_load));
-                }
+               // replaceViewPagerFragments(COLLECTION_ROOMS);
+                //if (getSupportFragmentManager().findFragmentByTag(getString(R.string.menu_navigation_rooms_load)) != null){
+                //    break;
+                //}else{
+                //    replaceFragment(LoadRoomFragment.newInstance(), getString(R.string.menu_navigation_rooms_load));
+                //}
                 break;
             case R.id.menu_navigation_users:
-                if (getSupportFragmentManager().findFragmentByTag(getString(R.string.menu_navigation_users)) != null){
-                    break;
-                }else{
-                    replaceFragment(UsersFragment.newInstance(), getString(R.string.menu_navigation_users));
-                }
+                replaceViewPagerFragments(COLLECTION_USERS);
+                //if (getSupportFragmentManager().findFragmentByTag(getString(R.string.menu_navigation_users)) != null){
+                //    break;
+                //}else{
+                //    replaceFragment(UsersFragment.newInstance(), getString(R.string.menu_navigation_users));
+               // }
+                //viewPagerAdapter.clearFragments();
+                //viewPagerAdapter.addFragment(UsersFragment.newInstance(), getString(R.string.menu_navigation_users));
+                //viewPagerAdapter.notifyDataSetChanged();
                 break;
             case R.id.menu_navigation_journal:
-                if (getSupportFragmentManager().findFragmentByTag(getString(R.string.menu_navigation_journal)) != null){
-                    break;
-                }else{
-                    replaceFragment(JournalFragment.newInstance(), getString(R.string.menu_navigation_journal));
-                }
+                replaceViewPagerFragments(COLLECTION_JOURNAL);
+                //if (getSupportFragmentManager().findFragmentByTag(getString(R.string.menu_navigation_journal)) != null){
+                 //   break;
+                //}else{
+                //    replaceFragment(JournalFragment.newInstance(), getString(R.string.menu_navigation_journal));
+               // }
                 break;
             default:
                 break;
@@ -294,7 +361,7 @@ public class MainActivity extends AppCompatActivity implements
         getMenuInflater().inflate(R.menu.main_menu, menu);
         serverConnectStatus = menu.findItem(R.id.menu_main_server_status);
 
-        ServerConnect.getConnection("10.38.2.6", 0, this);
+        ServerConnect.getConnection(null, 0, this);
 
         return true;
     }
@@ -303,7 +370,7 @@ public class MainActivity extends AppCompatActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.menu_main_server_status:
-                Toast.makeText(MainActivity.this, "SQL", Toast.LENGTH_SHORT).show();
+                new DialogSQLSetting().show(getSupportFragmentManager(), "dialog_sql_set");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -344,4 +411,5 @@ public class MainActivity extends AppCompatActivity implements
         handler.sendEmptyMessage(SERVER_DISCONNECTED);
 
     }
+
 }
