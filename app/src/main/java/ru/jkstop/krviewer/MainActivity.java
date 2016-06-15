@@ -322,7 +322,7 @@ public class MainActivity extends AppCompatActivity implements
 
         switch (item.getItemId()){
             case R.id.menu_navigation_rooms_load:
-               // replaceViewPagerFragments(COLLECTION_ROOMS);
+                replaceViewPagerFragments(COLLECTION_ROOMS);
                 //if (getSupportFragmentManager().findFragmentByTag(getString(R.string.menu_navigation_rooms_load)) != null){
                 //    break;
                 //}else{
