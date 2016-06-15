@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <item name="main_appbar" type="id"/>
     <item name="main_toolbar" type="id"/>
     <item name="main_fab" type="id"/>
     <item name="main_tabs" type="id"/>
