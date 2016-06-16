@@ -12,7 +12,9 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         int status = NetworkUtil.getConnectivityStatusString(context);
-        MainActivity.handler.sendEmptyMessage(status);
+        if (MainActivity.handler!=null){
+            MainActivity.handler.sendEmptyMessage(status);
+        }
     }
 
 }

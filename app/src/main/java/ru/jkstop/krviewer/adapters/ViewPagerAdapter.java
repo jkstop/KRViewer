@@ -23,19 +23,8 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        System.out.println("getfragment");
         return mFragmentList.get(position);
     }
-
-   // @Override
-   // public void destroyItem(ViewGroup container, int position, Object object) {
-   //     super.destroyItem(container, position, object);
-        //FragmentManager manager = ((Fragment) object).getFragmentManager();
-        //FragmentTransaction trans = manager.beginTransaction();
-        //trans.remove((Fragment) object);
-        //trans.commit();
-   // }
-
 
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
@@ -44,35 +33,29 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
             FragmentTransaction trans = manager.beginTransaction();
             trans.remove((Fragment) object);
             trans.commit();
-            System.out.println("destroyed " + object.toString());
         }
-
         super.destroyItem(container, position, object);
 
     }
 
     @Override
     public int getItemPosition(Object object) {
-        System.out.println("try get item position " + object.toString());
         return POSITION_NONE;
     }
 
     @Override
     public int getCount() {
-        System.out.println("getCount " + mFragmentList.size());
         return mFragmentList.size();
     }
 
     public void addFragment(Fragment fragment, String title) {
         mFragmentList.add(fragment);
         mFragmentTitleList.add(title);
-        System.out.println("fragment added " + fragment.toString());
     }
 
     public void clearFragments(){
         mFragmentList.clear();
         mFragmentTitleList.clear();
-        System.out.println("fragments cleared " + mFragmentList.size());
     }
 
     @Override

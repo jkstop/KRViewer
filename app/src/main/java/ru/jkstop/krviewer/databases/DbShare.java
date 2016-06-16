@@ -12,11 +12,11 @@ public class DbShare {
 
     public static final int USERS = 0;
     public static final int DB_JOURNAL = 1;
-    public static final int DB_ROOM = 2;
+    public static final int ROOMS = 2;
 
     private static UsersDB mDataBaseUsersOpenHelper;
    // private static JournalDBinit mDataBaseJournalOpenHelper;
-   // private static RoomDBinit mDataBaseRoomsOpenHelper;
+    private static RoomsDB mDataBaseRoomsOpenHelper;
     private static SQLiteDatabase mDataBaseUsers, mDataBaseJournal, mDataBaseRooms;
     private static Cursor mCursor;
 
@@ -24,7 +24,7 @@ public class DbShare {
 
         mDataBaseUsers = getDataBase(USERS);
         mDataBaseJournal = getDataBase(DB_JOURNAL);
-        mDataBaseRooms = getDataBase(DB_ROOM);
+        mDataBaseRooms = getDataBase(ROOMS);
     }
 
     public static SQLiteDatabase getDataBase(int db){
@@ -43,12 +43,12 @@ public class DbShare {
           //      }
           //      return mDataBaseJournal;
 
-          //  case DB_ROOM:
-          ///      if (mDataBaseRooms == null || !mDataBaseRooms.isOpen()){
-           //         mDataBaseRoomsOpenHelper = new RoomDBinit(App.getAppContext());
-         //           mDataBaseRooms = mDataBaseRoomsOpenHelper.getWritableDatabase();
-         //       }
-         //       return mDataBaseRooms;
+            case ROOMS:
+                if (mDataBaseRooms == null || !mDataBaseRooms.isOpen()){
+                    mDataBaseRoomsOpenHelper = new RoomsDB(App.getAppContext());
+                    mDataBaseRooms = mDataBaseRoomsOpenHelper.getWritableDatabase();
+                }
+                return mDataBaseRooms;
 
             default:
                     return null;
@@ -68,8 +68,8 @@ public class DbShare {
         if (mDataBaseUsers !=null) mDataBaseUsers.close();
        // if (mDataBaseJournalOpenHelper!=null) mDataBaseJournalOpenHelper.close();
       //  if (mDataBaseJournal!=null) mDataBaseJournal.close();
-      //  if (mDataBaseRoomsOpenHelper!=null) mDataBaseRoomsOpenHelper.close();
-      //  if (mDataBaseRooms!=null) mDataBaseRooms.close();
-      // if (mCursor !=null) mCursor.close();
+        if (mDataBaseRoomsOpenHelper!=null) mDataBaseRoomsOpenHelper.close();
+        if (mDataBaseRooms!=null) mDataBaseRooms.close();
+        if (mCursor !=null) mCursor.close();
     }
 }

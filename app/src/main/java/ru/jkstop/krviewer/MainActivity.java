@@ -3,12 +3,8 @@ package ru.jkstop.krviewer;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -18,12 +14,9 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.SearchView;
 import android.util.Base64;
-import android.view.MenuInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -35,16 +28,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
@@ -54,9 +43,11 @@ import java.sql.Connection;
 
 import ru.jkstop.krviewer.adapters.ViewPagerAdapter;
 import ru.jkstop.krviewer.databases.DbShare;
+import ru.jkstop.krviewer.databases.RoomsDB;
 import ru.jkstop.krviewer.databases.UsersDB;
 import ru.jkstop.krviewer.dialogs.DialogLogOut;
 import ru.jkstop.krviewer.dialogs.DialogSQLSetting;
+import ru.jkstop.krviewer.items.Room;
 import ru.jkstop.krviewer.items.User;
 
 public class MainActivity extends AppCompatActivity implements
@@ -69,10 +60,10 @@ public class MainActivity extends AppCompatActivity implements
     public static final int SERVER_CONNECTED = 101;
     public static final int SERVER_DISCONNECTED = 102;
 
+    private static final int SEARCH_USER_TASK = 20;
+
     private static final int COLLECTION_ROOMS = 10;
     private static final int COLLECTION_USERS = 11;
-    private static final int COLLECTION_JOURNAL = 12;
-
 
     private Context context;
 
@@ -84,7 +75,6 @@ public class MainActivity extends AppCompatActivity implements
     private ImageView accountImage, accountExit;
     private MenuItem serverConnectStatus;
 
-    //private ViewPagerAdapter viewPagerAdapter;
     private ViewPagerAdapter viewPagerAdapter;
 
     private static ServerConnect.Callback serverConnectionCallback;
@@ -113,18 +103,30 @@ public class MainActivity extends AppCompatActivity implements
         viewPager = (ViewPager)findViewById(R.id.main_view_pager);
         tabLayout = (TabLayout)findViewById(R.id.main_tabs);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-        //viewPagerAdapter.addFragment(MainPages.newInstance(MainPages.PAGE_CURRENT_LOAD), getString(R.string.menu_navigation_rooms_load));
-        //viewPagerAdapter.addFragment(MainPages.newInstance(MainPages.PAGE_HISTORY), getString(R.string.menu_navigation_journal));
 
         viewPager.setAdapter(viewPagerAdapter);
 
         tabLayout.setupWithViewPager(viewPager);
+
         tabLayout.setOnTabSelectedListener(
                 new TabLayout.ViewPagerOnTabSelectedListener(viewPager) {
                     @Override
                     public void onTabSelected(TabLayout.Tab tab) {
                         super.onTabSelected(tab);
                         appbar.setExpanded(true, true);
+                        System.out.println("tab selected " + tab.getText().toString());
+                        switch (tab.getText().toString()){
+                            case "Серверные":
+                                setSearchViewEnabled();
+                                break;
+                            default:
+                                getSupportActionBar().setDisplayShowCustomEnabled(false);
+                                System.out.println("RESULT WAS DELIVERED " + SearchFragment.resultWasDelivered);
+                                if (SearchFragment.resultWasDelivered){
+                                    SearchFragment.forceStop();
+                                }
+                                break;
+                        }
                     }
 
                     @Override
@@ -195,9 +197,39 @@ public class MainActivity extends AppCompatActivity implements
 
         navigationMenu.setNavigationItemSelectedListener(this);
 
-        //replaceFragment(LoadRoomFragment.newInstance(), getString(R.string.menu_navigation_rooms_load));
-        //viewPagerAdapter.addFragment(LoadRoomFragment.newInstance(), getString(R.string.menu_navigation_rooms_load));
-       // replaceViewPagerFragments(COLLECTION_ROOMS);
+    }
+
+    private void setSearchViewEnabled(){
+        getSupportActionBar().setCustomView(R.layout.view_searchbar);
+        final SearchView searchView = (SearchView) getSupportActionBar().getCustomView();
+        ImageView cancelSearch = (ImageView)searchView.findViewById(R.id.search_close_btn);
+        cancelSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SearchFragment.forceStop();
+                searchView.setQuery(null, false);
+            }
+        });
+
+
+        searchView.requestFocus();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (newText.length()>=3 && newText.length()<=6){
+                    SearchFragment.searchText = newText;
+                    ServerConnect.getConnection(null, SEARCH_USER_TASK, serverConnectionCallback);
+                }
+                return false;
+            }
+        });
+
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
     }
 
     private void initGoogleSingInAPI(){
@@ -300,30 +332,17 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    private void replaceFragment (Fragment fragment, String tag){
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.main_fragment_frame, fragment, tag)
-                .commit();
-    }
-
     private void replaceViewPagerFragments(int fragmentCollection){
         viewPagerAdapter.clearFragments();
         viewPagerAdapter.notifyDataSetChanged();
         switch (fragmentCollection){
             case COLLECTION_ROOMS:
-                viewPagerAdapter.addFragment(MainPages.newInstance(MainPages.PAGE_CURRENT_LOAD), "Текущая");
-                viewPagerAdapter.addFragment(MainPages.newInstance(MainPages.PAGE_HISTORY), "История");
-
-                //viewPagerAdapter.addFragment(LoadRoomFragment.newInstance(), getString(R.string.menu_navigation_rooms_load));
-                //viewPagerAdapter.addFragment(JournalFragment.newInstance(), getString(R.string.menu_navigation_journal));
+                viewPagerAdapter.addFragment(LoadRoomFragment.newInstance(), "Текущая");
+                viewPagerAdapter.addFragment(JournalFragment.newInstance(), "История");
                 break;
             case COLLECTION_USERS:
-                viewPagerAdapter.addFragment(UsersPages.newInstance(UsersPages.PAGE_LOCAL_USERS),"Локальные");
-                viewPagerAdapter.addFragment(UsersPages.newInstance(UsersPages.PAGE_SERVER_USERS),"Серверные");
-                break;
-            case COLLECTION_JOURNAL:
-
+                viewPagerAdapter.addFragment(UsersFragment.newInstance(),"Локальные");
+                viewPagerAdapter.addFragment(SearchFragment.newInstance(),"Серверные");
                 break;
             default:
                 break;
@@ -339,30 +358,9 @@ public class MainActivity extends AppCompatActivity implements
         switch (item.getItemId()){
             case R.id.menu_navigation_rooms_load:
                 replaceViewPagerFragments(COLLECTION_ROOMS);
-                //if (getSupportFragmentManager().findFragmentByTag(getString(R.string.menu_navigation_rooms_load)) != null){
-                //    break;
-                //}else{
-                //    replaceFragment(LoadRoomFragment.newInstance(), getString(R.string.menu_navigation_rooms_load));
-                //}
                 break;
             case R.id.menu_navigation_users:
                 replaceViewPagerFragments(COLLECTION_USERS);
-                //if (getSupportFragmentManager().findFragmentByTag(getString(R.string.menu_navigation_users)) != null){
-                //    break;
-                //}else{
-                //    replaceFragment(UsersFragment.newInstance(), getString(R.string.menu_navigation_users));
-               // }
-                //viewPagerAdapter.clearFragments();
-                //viewPagerAdapter.addFragment(UsersFragment.newInstance(), getString(R.string.menu_navigation_users));
-                //viewPagerAdapter.notifyDataSetChanged();
-                break;
-            case R.id.menu_navigation_journal:
-                replaceViewPagerFragments(COLLECTION_JOURNAL);
-                //if (getSupportFragmentManager().findFragmentByTag(getString(R.string.menu_navigation_journal)) != null){
-                 //   break;
-                //}else{
-                //    replaceFragment(JournalFragment.newInstance(), getString(R.string.menu_navigation_journal));
-               // }
                 break;
             default:
                 break;
@@ -419,6 +417,14 @@ public class MainActivity extends AppCompatActivity implements
     public void onServerConnected(Connection connection, int callingTask) {
         System.out.println("server connected " + connection);
         handler.sendEmptyMessage(SERVER_CONNECTED);
+        switch (callingTask){
+            case SEARCH_USER_TASK:
+                SearchFragment.cancelSearchTask();
+                SearchFragment.startSearchTask(connection);
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
@@ -427,5 +433,6 @@ public class MainActivity extends AppCompatActivity implements
         handler.sendEmptyMessage(SERVER_DISCONNECTED);
 
     }
+
 
 }

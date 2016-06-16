@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 
 /**
  * Соединение с сервером
@@ -102,12 +103,16 @@ public class ServerConnect {
     public static void closeConnection(){
         System.out.println("try close connection");
         if (SQLconnect!=null){
-            try {
-                SQLconnect.close();
-            } catch (Exception e){
-                e.printStackTrace();
-            }
-
+            new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            SQLconnect.close();
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                    }
+            }).start();
         }
     }
 
@@ -120,8 +125,6 @@ public class ServerConnect {
 
 
     private static void getConnectionFromUrl(final String serverName, final Callback callback){
-
-        System.out.println("START GET CONNECT SN " + serverName + " CB " + callback);
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
                 .permitAll().build();

@@ -5,6 +5,7 @@
     <item name="main_toolbar" type="id"/>
     <item name="main_fab" type="id"/>
     <item name="main_tabs" type="id"/>
+    <item name="main_searchbox" type="id"/>
 
     <item name="main_navigation_drawer" type="id"/>
     <item name="main_navigation_view" type="id"/>
@@ -33,4 +34,26 @@
     <item name="user_card_initials" type="id"/>
     <item name="user_card_division" type="id"/>
     <item name="user_card_photo" type="id"/>
+
+    <item name="room_free_card" type="id"/>
+    <item name="room_free_card_image" type="id"/>
+    <item name="room_free_card_text" type="id"/>
+
+    <item name="room_busy_card" type="id"/>
+    <item name="room_busy_container_image" type="id"/>
+    <item name="room_busy_user_image" type="id"/>
+    <item name="room_busy_key_image" type="id"/>
+    <item name="room_busy_text_room" type="id"/>
+    <item name="room_busy_text_user" type="id"/>
+
+    <item name="journal_card" type="id"/>
+    <item name="journal_card_room" type="id"/>
+    <item name="journal_card_photo_container" type="id"/>
+    <item name="journal_card_photo" type="id"/>
+    <item name="journal_card_user" type="id"/>
+    <item name="journal_card_time_in" type="id"/>
+    <item name="journal_card_time_out" type="id"/>
+    <item name="journal_card_time_icon" type="id"/>
+    <item name="journal_card_access_icon" type="id"/>
+    <item name="journal_card_delete" type="id"/>
 </resources>

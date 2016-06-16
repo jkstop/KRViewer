@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import ru.jkstop.krviewer.App;
+
 /**
  * Сохранение фото пользователей во внутреннее хранилище
  */
@@ -49,6 +51,10 @@ public class ImageSaver {
             }
         }
         return null;
+    }
+
+    public static File getCustomPath(){
+        return new File(App.getAppContext().getFilesDir() + TEMP);
     }
 
     private File createFile(String customDir){

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@id/journal_card"
+    android:layout_width="match_parent"
+    android:layout_height="140dp"
+    app:cardUseCompatPadding="true"
+    app:contentPadding="@dimen/content_default_padding"
+    app:elevation="@dimen/card_default_elevation">
+    
+    <android.support.percent.PercentRelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:id="@id/journal_card_photo_container"
+            android:layout_alignParentStart="true"
+            android:layout_width="64dp"
+            android:layout_height="64dp">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@id/journal_card_photo"
+                android:src="@drawable/ic_user_not_found"
+                android:layout_centerInParent="true"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@id/journal_card_access_icon"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:background="@drawable/shadow_rect"
+                app:srcCompat="@drawable/ic_credit_card_white_18dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@id/journal_card_user"
+            android:text="Journal card user"
+            android:layout_alignParentEnd="true"
+            android:layout_toEndOf="@id/journal_card_photo_container"
+            android:layout_alignBottom="@id/journal_card_photo_container"
+            android:layout_alignTop="@id/journal_card_photo_container"
+            android:gravity="center"
+            android:paddingStart="@dimen/content_default_padding"
+            android:paddingEnd="@dimen/content_default_padding"
+            android:maxLines="2"
+            style="@style/TextAppearance.AppCompat.Large"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:id="@id/journal_card_room"
+            android:text="456"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/journal_card_photo_container"
+            style="@style/TextAppearance.AppCompat.Display2"
+            android:textColor="@android:color/black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <RelativeLayout
+            android:layout_alignParentBottom="true"
+            android:layout_alignTop="@id/journal_card_room"
+            android:layout_toEndOf="@id/journal_card_room"
+            android:paddingStart="@dimen/content_default_padding"
+            android:paddingEnd="@dimen/content_default_padding"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:text="12:00:00"
+                android:id="@id/journal_card_time_in"
+                android:maxLines="1"
+                android:layout_toStartOf="@id/journal_card_time_icon"
+                android:gravity="center_vertical|end"
+                style="@style/TextAppearance.AppCompat.Title"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@id/journal_card_time_icon"
+                android:layout_centerInParent="true"
+                android:paddingStart="@dimen/content_default_padding"
+                android:paddingEnd="@dimen/content_default_padding"
+                app:srcCompat="@drawable/ic_access_alarm_black_24dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:text="13:00:00"
+                android:id="@id/journal_card_time_out"
+                android:maxLines="1"
+                android:layout_toEndOf="@id/journal_card_time_icon"
+                android:gravity="center_vertical|start"
+                style="@style/TextAppearance.AppCompat.Title"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </RelativeLayout>
+
+    </android.support.percent.PercentRelativeLayout>
+
+</android.support.v7.widget.CardView>

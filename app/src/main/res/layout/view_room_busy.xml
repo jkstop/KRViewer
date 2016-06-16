@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="140dp"
+    android:id="@id/room_busy_card"
+    app:contentPadding="@dimen/content_default_padding"
+    app:cardUseCompatPadding="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    app:cardBackgroundColor="#FFE57373">
+
+    <android.support.percent.PercentRelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.percent.PercentRelativeLayout
+            android:id="@id/room_busy_container_image"
+            app:layout_widthPercent="35%"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true">
+
+          <android.support.v7.widget.AppCompatImageView
+              android:id="@id/room_busy_user_image"
+              android:layout_width="wrap_content"
+              android:layout_height="match_parent"
+              android:scaleType="centerCrop"
+              app:srcCompat="@drawable/ic_user_not_found"/>
+
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@id/room_busy_key_image"
+                android:src="@drawable/ic_key_color"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:scaleType="fitEnd"
+                app:layout_heightPercent = "35%"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </android.support.percent.PercentRelativeLayout>
+
+        <android.support.percent.PercentRelativeLayout
+            android:layout_toEndOf="@id/room_busy_container_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@id/room_busy_text_room"
+                android:text="456"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_heightPercent="60%"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display2"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@id/room_busy_text_user"
+                android:text="User user user"
+                android:layout_below="@id/room_busy_text_room"
+                android:maxLines="2"
+                app:layout_heightPercent="40%"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+
+        </android.support.percent.PercentRelativeLayout>
+
+    </android.support.percent.PercentRelativeLayout>
+
+</android.support.v7.widget.CardView>

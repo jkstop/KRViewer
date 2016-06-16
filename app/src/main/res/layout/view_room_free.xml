@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@id/room_free_card"
+    android:layout_width="match_parent"
+    android:layout_height="140dp"
+    app:contentPadding="@dimen/content_default_padding"
+    app:cardUseCompatPadding="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    app:cardBackgroundColor="#FF42A5F5">
+
+    <android.support.percent.PercentRelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@id/room_free_card_image"
+            app:layout_widthPercent = "30%"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_key_color"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true" />
+
+        <TextView
+            android:id="@id/room_free_card_text"
+            android:text="456"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display2"
+            android:layout_toEndOf="@id/room_free_card_image"
+            android:layout_alignParentTop="true"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:maxLines="1" />
+
+    </android.support.percent.PercentRelativeLayout>
+
+</android.support.v7.widget.CardView>

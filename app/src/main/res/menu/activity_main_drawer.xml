@@ -10,10 +10,6 @@
             android:id="@id/menu_navigation_users"
             android:icon="@drawable/ic_account_box_black_24dp"
             android:title="@string/menu_navigation_users" />
-        <item
-            android:id="@id/menu_navigation_journal"
-            android:icon="@drawable/ic_view_list_black_24dp"
-            android:title="@string/menu_navigation_journal" />
     </group>
 
 </menu>

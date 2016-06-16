@@ -218,7 +218,7 @@ public class UsersDB extends SQLiteOpenHelper implements BaseColumns {
         }
     }
 
-    private static String getBinaryDefaultPhoto(){
+    public static String getBinaryDefaultPhoto(){
         try {
             Bitmap bitmap = BitmapFactory.decodeResource(App.getAppContext().getResources(), R.drawable.ic_user_not_found);
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

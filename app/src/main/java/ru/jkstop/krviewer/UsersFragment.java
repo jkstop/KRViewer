@@ -8,6 +8,7 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -73,16 +74,16 @@ public class UsersFragment extends Fragment implements RecyclerItemClickListener
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View fragmentView = inflater.inflate(R.layout.fragment_users, container, false);
+        View fragmentView = inflater.inflate(R.layout.recycler_main, container, false);
 
-        //mProgressBar = (ProgressBar)fragmentView.findViewById(R.id.main_progress_bar);
-        //mRecycler = (RecyclerView)fragmentView.findViewById(R.id.main_recycler);
-        //mAdapter = new AdapterUsersList(context, mUsersList, 0, this);
+        mProgressBar = (ProgressBar)fragmentView.findViewById(R.id.main_progress_bar);
+        mRecycler = (RecyclerView)fragmentView.findViewById(R.id.main_recycler);
+        mAdapter = new AdapterUsersList(context, mUsersList, 0, this);
 
-//        mRecycler.setAdapter(mAdapter);
-//        mRecycler.setLayoutManager(new GridLayoutManager(context, 1));
+        mRecycler.setAdapter(mAdapter);
+        mRecycler.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
 
-//        loadUsersTask().start();
+        loadUsersTask().start();
 
         return fragmentView;
     }
