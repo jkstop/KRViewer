@@ -14,7 +14,9 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.SearchView;
 import android.util.Base64;
 import android.view.View;
@@ -26,7 +28,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 import com.google.android.gms.auth.api.Auth;
@@ -40,19 +45,25 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.net.URL;
 import java.sql.Connection;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 import ru.jkstop.krviewer.adapters.ViewPagerAdapter;
 import ru.jkstop.krviewer.databases.DbShare;
+import ru.jkstop.krviewer.databases.JournalDB;
 import ru.jkstop.krviewer.databases.RoomsDB;
 import ru.jkstop.krviewer.databases.UsersDB;
 import ru.jkstop.krviewer.dialogs.DialogLogOut;
 import ru.jkstop.krviewer.dialogs.DialogSQLSetting;
-import ru.jkstop.krviewer.items.Room;
 import ru.jkstop.krviewer.items.User;
 
 public class MainActivity extends AppCompatActivity implements
         ServerConnect.Callback,
         DialogLogOut.Callback,
+ServerReader.Callback,
         NavigationView.OnNavigationItemSelectedListener,
         GoogleApiClient.OnConnectionFailedListener{
 
@@ -88,6 +99,9 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //JournalDB.addJournalItem(new JournalItem().setRoomName("45").setAccess(Room.ACCESS_CARD).setUserName("dfs").setOpenTime(System.currentTimeMillis()-1000000000));
+        //UsersDB.addUser(new User().setInitials("dsfdfs").setRadioLabel("asdfgc111"));
+
         initGoogleSingInAPI();
 
         serverConnectionCallback = this;
@@ -119,7 +133,11 @@ public class MainActivity extends AppCompatActivity implements
                             case "Серверные":
                                 setSearchViewEnabled();
                                 break;
+                            case "История":
+                                setSpinnerViewEnabled();
+                                break;
                             default:
+
                                 getSupportActionBar().setDisplayShowCustomEnabled(false);
                                 System.out.println("RESULT WAS DELIVERED " + SearchFragment.resultWasDelivered);
                                 if (SearchFragment.resultWasDelivered){
@@ -229,6 +247,32 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+    }
+
+    private void setSpinnerViewEnabled(){
+        getSupportActionBar().setCustomView(R.layout.view_spinnerbar);
+        AppCompatSpinner spinner = (AppCompatSpinner) getSupportActionBar().getCustomView();
+        final ArrayList <String> dates = new ArrayList<String>();
+        dates.addAll(JournalDB.getDates());
+
+        SpinnerAdapter spinnerAdapter = new ArrayAdapter<>(context,android.R.layout.simple_spinner_dropdown_item, dates);
+        spinner.setAdapter(spinnerAdapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                try {
+                    JournalFragment.loadJournalTask(new SimpleDateFormat("dd MMM yyyy", new Locale("RU", "ru")).parse(dates.get(position))).start();
+                } catch (ParseException e){
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
         getSupportActionBar().setDisplayShowCustomEnabled(true);
     }
 
@@ -362,6 +406,9 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.menu_navigation_users:
                 replaceViewPagerFragments(COLLECTION_USERS);
                 break;
+            case R.id.menu_navigation_journal:
+                ServerConnect.getConnection(null, ServerReader.READ_ALL, this);
+                break;
             default:
                 break;
         }
@@ -405,12 +452,40 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onSigningOut() {
+
+        clearDB().start();
+
         Auth.GoogleSignInApi.signOut(mGoogleApiClient);
         Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient);
 
         SharedPrefs.setActiveAccountID("local");
 
         initActiveUser();
+    }
+
+    private Thread clearDB(){
+        return new Thread(new Runnable() {
+            @Override
+            public void run() {
+                RoomsDB.clear();
+                UsersDB.clear();
+                JournalDB.clear();
+                updateFragments();
+            }
+        });
+    }
+
+    private void updateFragments(){
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.main_view_pager + ":" + viewPager.getCurrentItem());
+        System.out.println(fragment.getTag());
+
+        //if (!=null){
+        //    System.out.println("rooooms");
+        //} else if (getSupportFragmentManager().findFragmentByTag("Локальные")!=null){
+        //    System.out.println("locals");
+        //}
+        //LoadRoomFragment.loadRoomsTask().start();
+        //UsersFragment.loadUsersTask().start();
     }
 
     @Override
@@ -421,6 +496,9 @@ public class MainActivity extends AppCompatActivity implements
             case SEARCH_USER_TASK:
                 SearchFragment.cancelSearchTask();
                 SearchFragment.startSearchTask(connection);
+                break;
+            case ServerReader.READ_ALL:
+                new ServerReader(ServerReader.READ_ALL, context, this).execute(connection);
                 break;
             default:
                 break;
@@ -435,4 +513,15 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
+    @Override
+    public void onSuccessServerRead(int task, Object result) {
+        System.out.println("SUCCESS READED");
+        Snackbar.make(getCurrentFocus(),"Синхронизированно", Snackbar.LENGTH_SHORT).show();
+        updateFragments();
+    }
+
+    @Override
+    public void onErrorServerRead(Exception e) {
+        System.out.println("ERROR READED");
+    }
 }

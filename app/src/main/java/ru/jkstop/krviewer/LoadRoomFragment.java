@@ -3,6 +3,8 @@ package ru.jkstop.krviewer;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -27,18 +29,19 @@ import ru.jkstop.krviewer.items.Room;
  */
 public class LoadRoomFragment extends Fragment implements RecyclerItemClickListener {
 
-    private ArrayList<Room> mRoomList;
+    private static ArrayList<Room> mRoomList;
     private RecyclerView mRecycler;
     private AdapterRoomsList mAdapter;
 
     private ProgressBar mProgressBar;
 
-    private Handler mHandler;
+    public static final int HIDE_PROGRESS = 10;
+    public static final int UPDATE = 11;
+    public static Handler handler;
 
     private Context context;
 
     public static LoadRoomFragment newInstance(){
-        System.out.println("new rooms fragment");
         return new LoadRoomFragment();
     }
 
@@ -47,6 +50,23 @@ public class LoadRoomFragment extends Fragment implements RecyclerItemClickListe
         super.onCreate(savedInstanceState);
         context = getContext();
         mRoomList = new ArrayList<>();
+
+        handler = new Handler(Looper.getMainLooper()){
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                switch (msg.what){
+                    case HIDE_PROGRESS:
+                        if (mProgressBar!=null) mProgressBar.setVisibility(View.INVISIBLE);
+                        break;
+                    case UPDATE:
+                        if (mAdapter!=null) mAdapter.notifyDataSetChanged();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
     }
 
     @Nullable
@@ -55,24 +75,34 @@ public class LoadRoomFragment extends Fragment implements RecyclerItemClickListe
         View fragmentView = inflater.inflate(R.layout.recycler_main, container, false);
         mRecycler = (RecyclerView)fragmentView.findViewById(R.id.main_recycler);
 
-        mRoomList.addAll(RoomsDB.getRoomList());
-
-        for (int i=0;i<100;i++){
-            mRoomList.add(new Room().setName("Room " + i).setUserName("Lastname Firstname Midname").setStatus(Room.STATUS_FREE));
-        }
-
         mProgressBar = (ProgressBar)fragmentView.findViewById(R.id.main_progress_bar);
-        mProgressBar.setVisibility(View.INVISIBLE);
+        mProgressBar.setVisibility(View.VISIBLE);
 
         mAdapter = new AdapterRoomsList();
         mRecycler.setAdapter(mAdapter);
         mRecycler.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
+
+        loadRoomsTask().start();
+
         return fragmentView;
     }
 
     @Override
     public void onItemClick(View view, int position) {
 
+    }
+
+    public static Thread loadRoomsTask(){
+        return new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (!mRoomList.isEmpty()) mRoomList.clear();
+                mRoomList.addAll(RoomsDB.getRoomList());
+
+                handler.sendEmptyMessage(HIDE_PROGRESS);
+                handler.sendEmptyMessage(UPDATE);
+            }
+        });
     }
 
     private class AdapterRoomsList extends RecyclerView.Adapter<RecyclerView.ViewHolder> {

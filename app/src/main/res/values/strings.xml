@@ -14,7 +14,7 @@
     <string name="title_dialog_log_out">Выход из аккаунта</string>
     <string name="title_dialog_sql_connect">Подключение к MSSQL</string>
 
-    <string name="body_dialog_log_out">Вы точно хотите отсоединить этот аккаунт? Все введенные данные останутся невредимы</string>
+    <string name="body_dialog_log_out">Выйти из аккаунта? Все загруженные данные будут удалены!</string>
 
     <string name="hint_sql_input_server_name">Сервер</string>
 

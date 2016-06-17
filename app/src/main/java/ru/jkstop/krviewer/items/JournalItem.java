@@ -56,38 +56,17 @@ public class JournalItem {
         if (openTime == null) openTime = (long) 0;
         this.OpenTime = openTime;
         return this;
+
     }
 
-    public JournalItem setTimeIn (String timeIn){
-        long time;
-        try {
-            time = Long.parseLong(timeIn);
-        } catch (NumberFormatException e){
-            time = (long) 0;
-        }
-        this.OpenTime = time;
-        return this;
-    }
-
-    public JournalItem setCloseTime(String closeTime){
-        long time;
-        try {
-            time = Long.parseLong(closeTime);
-        } catch (NumberFormatException e){
-            time = (long) 0;
-        }
-        this.CloseTime = time;
+    public JournalItem setCloseTime(Long closeTime){
+        if (closeTime == null) closeTime = (long) 0;
+        this.CloseTime = closeTime;
         return this;
     }
 
     public Long getOpenTime(){
         return OpenTime;
-    }
-
-    public JournalItem setTimeOut (Long timeOut){
-        if (timeOut == null) timeOut = (long)0;
-        this.CloseTime = timeOut;
-        return this;
     }
 
     public Long getCloseTime(){

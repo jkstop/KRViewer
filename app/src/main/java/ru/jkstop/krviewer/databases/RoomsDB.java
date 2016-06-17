@@ -156,6 +156,31 @@ public class RoomsDB extends SQLiteOpenHelper implements BaseColumns{
         return rooms;
     }
 
+    public static ArrayList<String> getRoomsNamesList(){
+        Cursor cursor = null;
+        ArrayList<String> items = new ArrayList<>();
+        try {
+
+            cursor = DbShare.getCursor(DbShare.ROOMS,
+                    TABLE_ROOMS,
+                    new String[]{COLUMN_ROOM},
+                    null,
+                    null,
+                    null,
+                    COLUMN_ROOM + " ASC",
+                    null);
+            cursor.moveToPosition(-1);
+            while (cursor.moveToNext()){
+                items.add(cursor.getString(cursor.getColumnIndex(COLUMN_ROOM)));
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            closeCursor(cursor);
+        }
+        return items;
+    }
+
     public static boolean isRoomAlreadyInBase (String roomName){
         Cursor cursor = null;
         try {

@@ -11,11 +11,11 @@ import ru.jkstop.krviewer.App;
 public class DbShare {
 
     public static final int USERS = 0;
-    public static final int DB_JOURNAL = 1;
+    public static final int JOURNAL = 1;
     public static final int ROOMS = 2;
 
     private static UsersDB mDataBaseUsersOpenHelper;
-   // private static JournalDBinit mDataBaseJournalOpenHelper;
+    private static JournalDB mDataBaseJournalOpenHelper;
     private static RoomsDB mDataBaseRoomsOpenHelper;
     private static SQLiteDatabase mDataBaseUsers, mDataBaseJournal, mDataBaseRooms;
     private static Cursor mCursor;
@@ -23,7 +23,7 @@ public class DbShare {
     public DbShare(){
 
         mDataBaseUsers = getDataBase(USERS);
-        mDataBaseJournal = getDataBase(DB_JOURNAL);
+        mDataBaseJournal = getDataBase(JOURNAL);
         mDataBaseRooms = getDataBase(ROOMS);
     }
 
@@ -36,12 +36,12 @@ public class DbShare {
                 }
                 return mDataBaseUsers;
 
-          //  case DB_JOURNAL:
-          //      if (mDataBaseJournal == null || !mDataBaseJournal.isOpen()){
-          //          mDataBaseJournalOpenHelper = new JournalDBinit(App.getAppContext());
-          //          mDataBaseJournal = mDataBaseJournalOpenHelper.getWritableDatabase();
-          //      }
-          //      return mDataBaseJournal;
+            case JOURNAL:
+                if (mDataBaseJournal == null || !mDataBaseJournal.isOpen()){
+                    mDataBaseJournalOpenHelper = new JournalDB(App.getAppContext());
+                    mDataBaseJournal = mDataBaseJournalOpenHelper.getWritableDatabase();
+                }
+                return mDataBaseJournal;
 
             case ROOMS:
                 if (mDataBaseRooms == null || !mDataBaseRooms.isOpen()){
@@ -66,8 +66,8 @@ public class DbShare {
 
         if (mDataBaseUsersOpenHelper !=null) mDataBaseUsersOpenHelper.close();
         if (mDataBaseUsers !=null) mDataBaseUsers.close();
-       // if (mDataBaseJournalOpenHelper!=null) mDataBaseJournalOpenHelper.close();
-      //  if (mDataBaseJournal!=null) mDataBaseJournal.close();
+        if (mDataBaseJournalOpenHelper!=null) mDataBaseJournalOpenHelper.close();
+        if (mDataBaseJournal!=null) mDataBaseJournal.close();
         if (mDataBaseRoomsOpenHelper!=null) mDataBaseRoomsOpenHelper.close();
         if (mDataBaseRooms!=null) mDataBaseRooms.close();
         if (mCursor !=null) mCursor.close();

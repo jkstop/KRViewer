@@ -13,7 +13,6 @@ import android.util.Base64;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.sql.Connection;
 import java.util.ArrayList;
 
 import ru.jkstop.krviewer.App;
@@ -128,6 +127,27 @@ public class UsersDB extends SQLiteOpenHelper implements BaseColumns {
         return items;
     }
 
+    public static ArrayList<String> getUsersRadioLabels(){
+        ArrayList <String> items = new ArrayList <>();
+        Cursor cursor = null;
+        try {
+            cursor = DbShare.getCursor(DbShare.USERS,
+                    TABLE_USERS,
+                    new String[]{COLUMN_RADIO_LABEL},
+                    null,null,null,null,null);
+            cursor.moveToPosition(-1);
+            while (cursor.moveToNext()){
+                items.add(cursor.getString(cursor.getColumnIndex(COLUMN_RADIO_LABEL)));
+            }
+            return items;
+        } catch (Exception e){
+            e.printStackTrace();
+            return items;
+        } finally {
+            closeCursor(cursor);
+        }
+    }
+
     public static boolean addUser (@NonNull User user) {
         try {
             //если пользователь уже есть в базе, то обновляем запись
@@ -199,6 +219,63 @@ public class UsersDB extends SQLiteOpenHelper implements BaseColumns {
         }
     }
 
+    public static File getUserPhoto (@NonNull String userRadioLabel){
+        Cursor cursor = null;
+        try {
+            cursor = DbShare.getCursor(DbShare.USERS,
+                        TABLE_USERS,
+                        new String[]{COLUMN_PHOTO_PATH},
+                        COLUMN_RADIO_LABEL + " =?",
+                        new String[]{userRadioLabel},
+                        null,
+                        null,
+                        "1");
+
+                if (cursor.getCount()>0){
+                    cursor.moveToFirst();
+                    return new File(cursor.getString(cursor.getColumnIndex(COLUMN_PHOTO_PATH)));
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            } finally {
+                closeCursor(cursor);
+            }
+
+        return null;
+    }
+
+    //удаление пользователя
+    public static void deleteUser(String userRadioLabel){
+
+        Cursor cursor = null;
+        try{
+            //удаляем фото из хранилища
+            getUserPhoto(userRadioLabel).delete();
+
+            cursor = DbShare.getCursor(DbShare.USERS,
+                    TABLE_USERS,
+                    new String[]{_ID},
+                    COLUMN_RADIO_LABEL + " =?",
+                    new String[]{userRadioLabel},
+                    null,
+                    null,
+                    null);
+
+            if (cursor.getCount()>0){
+                cursor.moveToPosition(-1);
+                while (cursor.moveToNext()){
+                    DbShare.getDataBase(DbShare.USERS).delete(TABLE_USERS, _ID + "=" + cursor.getInt(cursor.getColumnIndex(_ID)), null);
+                }
+            }
+
+
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            closeCursor(cursor);
+        }
+    }
+
     public static boolean isUserInBase(String radioLabel){
         Cursor cursor = null;
         try {
@@ -248,5 +325,41 @@ public class UsersDB extends SQLiteOpenHelper implements BaseColumns {
         } catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public static String createUserInitials (int initialsType, String lastname, String firstname, String midname){
+        String initials = "";
+        switch (initialsType){
+            case SHORT_INITIALS:
+                if (lastname != null && firstname != null && midname != null && firstname.length() != 0 && midname.length() != 0) {
+                    initials = lastname + " " + firstname.charAt(0) + "." + midname.charAt(0) + ".";
+                } else {
+                    if (lastname != null && firstname != null) {
+                        initials = lastname + " " + firstname;
+                    } else {
+                        if (lastname != null) {
+                            initials = lastname;
+                        }
+                    }
+                }
+                break;
+            case FULL_INITIALS:
+                if (lastname != null && firstname != null && midname != null) {
+                    initials = lastname + " " + firstname + " " + midname;
+                } else {
+                    if (lastname != null && firstname != null) {
+                        initials = lastname + " " + firstname;
+                    } else {
+                        if (lastname != null) {
+                            initials = lastname;
+                        }
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+        return initials;
+
     }
 }

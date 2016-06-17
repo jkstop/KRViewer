@@ -7,10 +7,8 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,17 +26,17 @@ import ru.jkstop.krviewer.items.User;
 public class UsersFragment extends Fragment implements RecyclerItemClickListener{
 
     private static final int HIDE_PROGRESS = 10;
-    private static final int UPDATE_LIST = 11;
+    public static final int UPDATE = 11;
 
     private Context context;
 
-    private ArrayList<User> mUsersList;
+    private static ArrayList<User> mUsersList;
     private RecyclerView mRecycler;
     private AdapterUsersList mAdapter;
 
     private ProgressBar mProgressBar;
 
-    private Handler mHandler;
+    public static Handler handler;
 
     public static UsersFragment newInstance(){
         System.out.println("new users fragment");
@@ -53,16 +51,16 @@ public class UsersFragment extends Fragment implements RecyclerItemClickListener
 
         mUsersList = new ArrayList<>();
 
-        mHandler = new Handler(Looper.getMainLooper()){
+        handler = new Handler(Looper.getMainLooper()){
             @Override
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
                 switch (msg.what){
                     case HIDE_PROGRESS:
-                        mProgressBar.setVisibility(View.INVISIBLE);
+                        if (mProgressBar!=null) mProgressBar.setVisibility(View.INVISIBLE);
                         break;
-                    case UPDATE_LIST:
-                        mAdapter.notifyDataSetChanged();
+                    case UPDATE:
+                        if (mAdapter!=null) mAdapter.notifyDataSetChanged();
                         break;
                     default:
                         break;
@@ -88,21 +86,17 @@ public class UsersFragment extends Fragment implements RecyclerItemClickListener
         return fragmentView;
     }
 
-    private void loadUsersList(){
-        if (!mUsersList.isEmpty()) mUsersList.clear();
-        mUsersList.addAll(UsersDB.getUserList());
-        for (int i=0;i<100;i++){
-            mUsersList.add(new User().setInitials("Lastname Firstname Midname " + i).setDivision("Division #" + i));
-        }
-    }
 
-    private Thread loadUsersTask (){
+
+    public static Thread loadUsersTask (){
         return new Thread(new Runnable() {
             @Override
             public void run() {
-                loadUsersList();
-                mHandler.sendEmptyMessage(HIDE_PROGRESS);
-                mHandler.sendEmptyMessage(UPDATE_LIST);
+                if (!mUsersList.isEmpty()) mUsersList.clear();
+                mUsersList.addAll(UsersDB.getUserList());
+
+                handler.sendEmptyMessage(HIDE_PROGRESS);
+                handler.sendEmptyMessage(UPDATE);
             }
         });
     }

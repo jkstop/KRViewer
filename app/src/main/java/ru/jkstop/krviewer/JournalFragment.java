@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
@@ -21,7 +23,9 @@ import com.squareup.picasso.Picasso;
 import java.io.File;
 import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Date;
 
+import ru.jkstop.krviewer.databases.JournalDB;
 import ru.jkstop.krviewer.items.JournalItem;
 import ru.jkstop.krviewer.items.Room;
 
@@ -30,15 +34,18 @@ import ru.jkstop.krviewer.items.Room;
  */
 public class JournalFragment extends Fragment {
 
-    private ArrayList<JournalItem> mJournalList;
+    private static ArrayList<JournalItem> mJournalList;
     private RecyclerView mRecycler;
     private AdapterJournalList mAdapter;
 
     private ProgressBar mProgressBar;
 
-    private Handler mHandler;
+    private static Handler mHandler;
 
     private Context context;
+
+    private static final int HIDE_PROGRESS = 10;
+    private static final int UPDATE_LIST = 11;
 
     public static JournalFragment newInstance(){
         System.out.println("new journal fragment");
@@ -50,6 +57,23 @@ public class JournalFragment extends Fragment {
         super.onCreate(savedInstanceState);
         context = getContext();
         mJournalList = new ArrayList<>();
+
+        mHandler = new Handler(Looper.getMainLooper()){
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                switch (msg.what){
+                    case HIDE_PROGRESS:
+                        mProgressBar.setVisibility(View.INVISIBLE);
+                        break;
+                    case UPDATE_LIST:
+                        mAdapter.notifyDataSetChanged();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
     }
 
     @Nullable
@@ -57,16 +81,28 @@ public class JournalFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View fragmentView = inflater.inflate(R.layout.recycler_main, container, false);
 
-        for (int i=0; i<100;i++){
-            mJournalList.add(new JournalItem().setRoomName("111").setUserName("Username U. S.").setAccess(Room.ACCESS_CARD).setOpenTime(System.currentTimeMillis()));
-        }
         mProgressBar = (ProgressBar)fragmentView.findViewById(R.id.main_progress_bar);
-        mProgressBar.setVisibility(View.INVISIBLE);
+
         mRecycler = (RecyclerView)fragmentView.findViewById(R.id.main_recycler);
         mAdapter = new AdapterJournalList();
         mRecycler.setAdapter(mAdapter);
         mRecycler.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
+
         return fragmentView;
+    }
+
+    public static Thread loadJournalTask(final Date date){
+        return new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                if (!mJournalList.isEmpty()) mJournalList.clear();
+                mJournalList.addAll(JournalDB.getJournalItems(date));
+
+                mHandler.sendEmptyMessage(HIDE_PROGRESS);
+                mHandler.sendEmptyMessage(UPDATE_LIST);
+            }
+        });
     }
 
     private class AdapterJournalList extends RecyclerView.Adapter<AdapterJournalList.ViewHolderJournalItem> {
