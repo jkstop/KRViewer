@@ -70,6 +70,7 @@ ServerReader.Callback,
     private static final int SIGN_IN = 100;
     public static final int SERVER_CONNECTED = 101;
     public static final int SERVER_DISCONNECTED = 102;
+    public static final int CLOSE_DRAWER = 103;
 
     private static final int SEARCH_USER_TASK = 20;
 
@@ -188,6 +189,9 @@ ServerReader.Callback,
                         break;
                     case NetworkUtil.NETWORK_STATUS_MOBILE:
                         serverConnectStatus.setIcon(R.drawable.ic_cloud_off_black_24dp);
+                        break;
+                    case CLOSE_DRAWER:
+                        drawer.closeDrawer(GravityCompat.START);
                         break;
                     default:
                         break;
@@ -329,7 +333,7 @@ ServerReader.Callback,
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        System.out.println("logon result " + resultCode + " request " + requestCode);
         if (resultCode == Activity.RESULT_OK){
             switch (requestCode){
                 case SIGN_IN:
@@ -477,7 +481,15 @@ ServerReader.Callback,
 
     private void updateFragments(){
         Fragment fragment = getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.main_view_pager + ":" + viewPager.getCurrentItem());
-        System.out.println(fragment.getTag());
+        if (fragment instanceof LoadRoomFragment){
+            LoadRoomFragment.loadRoomsTask().start();
+        } else if (fragment instanceof UsersFragment){
+            UsersFragment.loadUsersTask().start();
+        }
+
+        handler.sendEmptyMessage(CLOSE_DRAWER);
+
+        //System.out.println(fragment.getTag());
 
         //if (!=null){
         //    System.out.println("rooooms");
