@@ -12,8 +12,4 @@
             android:title="@string/menu_navigation_users" />
     </group>
 
-    <item
-        android:id="@id/menu_navigation_journal"
-        android:title="Загрузить"/>
-
 </menu>

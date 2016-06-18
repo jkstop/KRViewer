@@ -7,6 +7,7 @@
     <item name="main_tabs" type="id"/>
     <item name="main_searchbox" type="id"/>
     <item name="main_spinner" type="id"/>
+    <item name="main_swipe_refresh" type="id"/>
 
     <item name="main_navigation_drawer" type="id"/>
     <item name="main_navigation_view" type="id"/>

@@ -6,4 +6,8 @@
     <color name="colorAccent">#ff4081</color>
 
     <color name="black_alpha_50">#80000000</color>
+
+    <color name="refresh_progress_1">@color/colorPrimaryLight</color>
+    <color name="refresh_progress_2">@color/colorPrimary</color>
+    <color name="refresh_progress_3">@color/colorAccent</color>
 </resources>

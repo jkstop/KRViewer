@@ -193,13 +193,13 @@ public class JournalDB extends SQLiteOpenHelper implements BaseColumns {
             while (cursor.moveToNext()){
                 items.add(cursor.getLong(cursor.getColumnIndex(COLUMN_OPEN_TIME)));
             }
-            return items;
+
         }catch (Exception e){
             e.printStackTrace();
-            return items;
         } finally {
             closeCursor(cursor);
         }
+        return items;
     }
 
     public static int getCount(int type){

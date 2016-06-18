@@ -200,6 +200,50 @@ public class RoomsDB extends SQLiteOpenHelper implements BaseColumns{
         }
     }
 
+    public static int getRoomStatus(String roomName){
+        Cursor cursor = null;
+        try {
+            cursor = DbShare.getCursor(DbShare.ROOMS, TABLE_ROOMS,
+                    new String[]{COLUMN_STATUS},
+                    COLUMN_ROOM + " =?",
+                    new String[]{roomName},
+                    null,
+                    null,
+                    "1");
+            if (cursor.getCount()>0){
+                cursor.moveToFirst();
+                return cursor.getInt(cursor.getColumnIndex(COLUMN_STATUS));
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            closeCursor(cursor);
+        }
+        return -1;
+    }
+
+    public static long getRoomOpenTime (String roomName){
+        Cursor cursor = null;
+        try {
+            cursor = DbShare.getCursor(DbShare.ROOMS, TABLE_ROOMS,
+                    new String[]{COLUMN_OPEN_TIME},
+                    COLUMN_ROOM + " =?",
+                    new String[]{roomName},
+                    null,
+                    null,
+                    "1");
+            if (cursor.getCount()>0){
+                cursor.moveToFirst();
+                return cursor.getLong(cursor.getColumnIndex(COLUMN_OPEN_TIME));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            closeCursor(cursor);
+        }
+        return 0;
+    }
+
     public static void clear(){
         try {
             DbShare.getDataBase(DbShare.ROOMS).delete(TABLE_ROOMS,null,null);

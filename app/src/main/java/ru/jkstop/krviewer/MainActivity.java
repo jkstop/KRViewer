@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -16,6 +17,7 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.SearchView;
 import android.util.Base64;
@@ -82,6 +84,7 @@ ServerReader.Callback,
     private DrawerLayout drawer;
     private ViewPager viewPager;
     private TabLayout tabLayout;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private FloatingActionButton mainFAB;
     private TextView accountName, accountEmail;
     private ImageView accountImage, accountExit;
@@ -117,6 +120,7 @@ ServerReader.Callback,
         drawer = (DrawerLayout)findViewById(R.id.main_navigation_drawer);
         viewPager = (ViewPager)findViewById(R.id.main_view_pager);
         tabLayout = (TabLayout)findViewById(R.id.main_tabs);
+
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
 
         viewPager.setAdapter(viewPagerAdapter);
@@ -154,6 +158,14 @@ ServerReader.Callback,
                     }
                 });
 
+        swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.main_swipe_refresh);
+        swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                ServerConnect.getConnection(null, ServerReader.READ_ALL, serverConnectionCallback);
+            }
+        });
 
         replaceViewPagerFragments(COLLECTION_ROOMS);
 
@@ -176,6 +188,7 @@ ServerReader.Callback,
                         break;
                     case SERVER_DISCONNECTED:
                         serverConnectStatus.setIcon(R.drawable.ic_cloud_off_black_24dp);
+                        swipeRefreshLayout.setRefreshing(false);
                         break;
                     case NetworkUtil.NETWORK_STATUS_NOT_CONNECTED:
                         serverConnectStatus.setIcon(R.drawable.ic_cloud_off_black_24dp);
@@ -410,9 +423,6 @@ ServerReader.Callback,
             case R.id.menu_navigation_users:
                 replaceViewPagerFragments(COLLECTION_USERS);
                 break;
-            case R.id.menu_navigation_journal:
-                ServerConnect.getConnection(null, ServerReader.READ_ALL, this);
-                break;
             default:
                 break;
         }
@@ -488,16 +498,6 @@ ServerReader.Callback,
         }
 
         handler.sendEmptyMessage(CLOSE_DRAWER);
-
-        //System.out.println(fragment.getTag());
-
-        //if (!=null){
-        //    System.out.println("rooooms");
-        //} else if (getSupportFragmentManager().findFragmentByTag("Локальные")!=null){
-        //    System.out.println("locals");
-        //}
-        //LoadRoomFragment.loadRoomsTask().start();
-        //UsersFragment.loadUsersTask().start();
     }
 
     @Override
@@ -528,12 +528,14 @@ ServerReader.Callback,
     @Override
     public void onSuccessServerRead(int task, Object result) {
         System.out.println("SUCCESS READED");
-        Snackbar.make(getCurrentFocus(),"Синхронизированно", Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(getCurrentFocus(),"Синхронизировано", Snackbar.LENGTH_SHORT).show();
+        swipeRefreshLayout.setRefreshing(false);
         updateFragments();
     }
 
     @Override
     public void onErrorServerRead(Exception e) {
         System.out.println("ERROR READED");
+        swipeRefreshLayout.setRefreshing(false);
     }
 }

@@ -5,8 +5,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -33,6 +35,7 @@ public class UsersFragment extends Fragment implements RecyclerItemClickListener
     private static ArrayList<User> mUsersList;
     private RecyclerView mRecycler;
     private AdapterUsersList mAdapter;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     private ProgressBar mProgressBar;
 
