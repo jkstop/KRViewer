@@ -41,6 +41,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.server.converter.StringToIntConverter;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
@@ -51,7 +52,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import ru.jkstop.krviewer.adapters.ViewPagerAdapter;
 import ru.jkstop.krviewer.databases.DbShare;
@@ -98,10 +101,40 @@ ServerReader.Callback,
 
     private GoogleApiClient mGoogleApiClient;
 
+    public enum  TabTitle{
+        currentLoad (App.getAppContext().getString(R.string.title_tab_current_load)),
+        historyLoad (App.getAppContext().getString(R.string.title_tab_history_load)),
+        localusers (App.getAppContext().getString(R.string.title_tab_local_users)),
+        serverUsers (App.getAppContext().getString(R.string.title_tab_server_users));
+
+        private static final Map<String, TabTitle> map = new HashMap<>();
+        static {
+            for (TabTitle en : values()) {
+                map.put(en.text, en);
+            }
+        }
+
+        public static TabTitle valueFor(String name) {
+            return map.get(name);
+        }
+
+        final String text;
+        TabTitle(final String title){
+            this.text = title;
+        }
+
+        @Override
+        public String toString() {
+            return text;
+        }
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         //JournalDB.addJournalItem(new JournalItem().setRoomName("45").setAccess(Room.ACCESS_CARD).setUserName("dfs").setOpenTime(System.currentTimeMillis()-1000000000));
         //UsersDB.addUser(new User().setInitials("dsfdfs").setRadioLabel("asdfgc111"));
@@ -133,18 +166,16 @@ ServerReader.Callback,
                     public void onTabSelected(TabLayout.Tab tab) {
                         super.onTabSelected(tab);
                         appbar.setExpanded(true, true);
-                        System.out.println("tab selected " + tab.getText().toString());
-                        switch (tab.getText().toString()){
-                            case "Серверные":
+                        switch (TabTitle.valueFor(tab.getText().toString())){
+                            case serverUsers:
                                 setSearchViewEnabled();
                                 break;
-                            case "История":
+                            case historyLoad:
                                 setSpinnerViewEnabled();
                                 break;
                             default:
-
                                 getSupportActionBar().setDisplayShowCustomEnabled(false);
-                                System.out.println("RESULT WAS DELIVERED " + SearchFragment.resultWasDelivered);
+
                                 if (SearchFragment.resultWasDelivered){
                                     SearchFragment.forceStop();
                                 }
@@ -189,6 +220,13 @@ ServerReader.Callback,
                     case SERVER_DISCONNECTED:
                         serverConnectStatus.setIcon(R.drawable.ic_cloud_off_black_24dp);
                         swipeRefreshLayout.setRefreshing(false);
+                        Snackbar.make(getCurrentFocus(),"Нет подключения к серверу!", Snackbar.LENGTH_SHORT)
+                                .setAction("Настройка", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        new DialogSQLSetting().show(getSupportFragmentManager(), "dialog_sql_set");
+                                    }
+                                }).show();
                         break;
                     case NetworkUtil.NETWORK_STATUS_NOT_CONNECTED:
                         serverConnectStatus.setIcon(R.drawable.ic_cloud_off_black_24dp);
@@ -398,12 +436,12 @@ ServerReader.Callback,
         viewPagerAdapter.notifyDataSetChanged();
         switch (fragmentCollection){
             case COLLECTION_ROOMS:
-                viewPagerAdapter.addFragment(LoadRoomFragment.newInstance(), "Текущая");
-                viewPagerAdapter.addFragment(JournalFragment.newInstance(), "История");
+                viewPagerAdapter.addFragment(LoadRoomFragment.newInstance(), TabTitle.currentLoad.text);
+                viewPagerAdapter.addFragment(JournalFragment.newInstance(), TabTitle.historyLoad.text);
                 break;
             case COLLECTION_USERS:
-                viewPagerAdapter.addFragment(UsersFragment.newInstance(),"Локальные");
-                viewPagerAdapter.addFragment(SearchFragment.newInstance(),"Серверные");
+                viewPagerAdapter.addFragment(UsersFragment.newInstance(), TabTitle.localusers.text);
+                viewPagerAdapter.addFragment(SearchFragment.newInstance(), TabTitle.serverUsers.text);
                 break;
             default:
                 break;
@@ -536,6 +574,7 @@ ServerReader.Callback,
     @Override
     public void onErrorServerRead(Exception e) {
         System.out.println("ERROR READED");
+        Snackbar.make(getCurrentFocus(),"Ошибка синхронизации", Snackbar.LENGTH_SHORT).show();
         swipeRefreshLayout.setRefreshing(false);
     }
 }
