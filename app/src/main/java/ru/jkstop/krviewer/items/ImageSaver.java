@@ -19,14 +19,15 @@ public class ImageSaver {
     private Context mContext;
     private String mFileName;
 
-    public static final String TEMP = "/Temp";
+    public static final String DIRECTORY_TEMP = "/Temp";
+    public static final String PREFIX_WEBP = ".webp";
 
     public ImageSaver(Context context) {
         mContext = context;
     }
 
     public ImageSaver setFileName (String fileName){
-        mFileName = fileName + ".webp";
+        mFileName = fileName + PREFIX_WEBP;
         return this;
     }
 
@@ -54,7 +55,7 @@ public class ImageSaver {
     }
 
     public static File getCustomPath(){
-        return new File(App.getAppContext().getFilesDir() + TEMP);
+        return new File(App.getAppContext().getFilesDir() + DIRECTORY_TEMP);
     }
 
     private File createFile(String customDir){

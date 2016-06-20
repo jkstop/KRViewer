@@ -9,7 +9,6 @@ public class JournalItem {
     private long OpenTime;
     private long CloseTime;
     private int Access;
-    private String UserPhotoPath;
     private String UserName;
     private String UserRadioLabel;
 
@@ -29,17 +28,6 @@ public class JournalItem {
 
     public String getUserName(){
         return UserName;
-    }
-
-
-    public JournalItem setUserPhotoPath(String photoPath){
-        this.UserPhotoPath = photoPath;
-        return this;
-    }
-
-    public String getUserPhotoPath(){
-        if (UserPhotoPath == null) UserPhotoPath = "";
-        return UserPhotoPath;
     }
 
 

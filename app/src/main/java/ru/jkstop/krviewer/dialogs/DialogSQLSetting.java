@@ -76,6 +76,8 @@ public class DialogSQLSetting extends DialogFragment implements ServerConnect.Ca
                 }
             }
         };
+
+        //setStyle(DialogFragment.STYLE_NORMAL, android.R.style.Theme_Material_Light_LightStatusBar);
     }
 
     @Nullable

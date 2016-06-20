@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import ru.jkstop.krviewer.databases.JournalDB;
+import ru.jkstop.krviewer.databases.UsersDB;
 import ru.jkstop.krviewer.items.JournalItem;
 import ru.jkstop.krviewer.items.Room;
 
@@ -138,7 +139,7 @@ public class JournalFragment extends Fragment {
             }
 
             Picasso.with(context)
-                    .load(new File(mJournalList.get(position).getUserPhotoPath()))
+                    .load(UsersDB.getUserPhoto(mJournalList.get(position).getUserRadioLabel()))
                     .fit()
                     .centerCrop()
                     .placeholder(R.drawable.ic_user_not_found)

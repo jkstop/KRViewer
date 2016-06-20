@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -69,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements
         ServerConnect.Callback,
         DialogLogOut.Callback,
 ServerReader.Callback,
+JournalDB.backupJournalToFile.Callback,
         NavigationView.OnNavigationItemSelectedListener,
         GoogleApiClient.OnConnectionFailedListener{
 
@@ -92,6 +94,7 @@ ServerReader.Callback,
     private TextView accountName, accountEmail;
     private ImageView accountImage, accountExit;
     private MenuItem serverConnectStatus;
+    private AppCompatSpinner spinner;
 
     private ViewPagerAdapter viewPagerAdapter;
 
@@ -100,6 +103,8 @@ ServerReader.Callback,
     public static Handler handler;
 
     private GoogleApiClient mGoogleApiClient;
+
+
 
     public enum  TabTitle{
         currentLoad (App.getAppContext().getString(R.string.title_tab_current_load)),
@@ -167,18 +172,27 @@ ServerReader.Callback,
                         super.onTabSelected(tab);
                         appbar.setExpanded(true, true);
                         switch (TabTitle.valueFor(tab.getText().toString())){
-                            case serverUsers:
-                                setSearchViewEnabled();
+                            case currentLoad:
+                                getSupportActionBar().setTitle(getString(R.string.menu_navigation_rooms_load));
+                                getSupportActionBar().setDisplayShowCustomEnabled(false);
+                                eraseTempSearchFiles();
                                 break;
                             case historyLoad:
+                                getSupportActionBar().setTitle(null);
                                 setSpinnerViewEnabled();
+                                break;
+                            case localusers:
+                                getSupportActionBar().setTitle(getString(R.string.menu_navigation_users));
+                                getSupportActionBar().setDisplayShowCustomEnabled(false);
+                                eraseTempSearchFiles();
+                                break;
+                            case serverUsers:
+                                setSearchViewEnabled();
                                 break;
                             default:
                                 getSupportActionBar().setDisplayShowCustomEnabled(false);
 
-                                if (SearchFragment.resultWasDelivered){
-                                    SearchFragment.forceStop();
-                                }
+                                eraseTempSearchFiles();
                                 break;
                         }
                     }
@@ -255,14 +269,6 @@ ServerReader.Callback,
 
         initActiveUser();
 
-        mainFAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
@@ -270,6 +276,12 @@ ServerReader.Callback,
 
         navigationMenu.setNavigationItemSelectedListener(this);
 
+    }
+
+    private void eraseTempSearchFiles(){
+        if (SearchFragment.resultWasDelivered){
+            SearchFragment.forceStop();
+        }
     }
 
     private void setSearchViewEnabled(){
@@ -285,7 +297,7 @@ ServerReader.Callback,
         });
 
 
-        searchView.requestFocus();
+       // searchView.requestFocus();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -307,7 +319,7 @@ ServerReader.Callback,
 
     private void setSpinnerViewEnabled(){
         getSupportActionBar().setCustomView(R.layout.view_spinnerbar);
-        AppCompatSpinner spinner = (AppCompatSpinner) getSupportActionBar().getCustomView();
+        spinner = (AppCompatSpinner) getSupportActionBar().getCustomView();
         final ArrayList <String> dates = new ArrayList<String>();
         dates.addAll(JournalDB.getDates());
 
@@ -448,18 +460,33 @@ ServerReader.Callback,
         }
         viewPagerAdapter.notifyDataSetChanged();
 
+        tabLayout.getTabAt(0).select();
+
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
 
+        Fragment currentFragment = getCurrentFragment();
+
         switch (item.getItemId()){
             case R.id.menu_navigation_rooms_load:
-                replaceViewPagerFragments(COLLECTION_ROOMS);
+                if (currentFragment instanceof LoadRoomFragment || currentFragment instanceof JournalFragment){
+                    break;
+                }else {
+                    replaceViewPagerFragments(COLLECTION_ROOMS);
+                }
                 break;
             case R.id.menu_navigation_users:
-                replaceViewPagerFragments(COLLECTION_USERS);
+                if (currentFragment instanceof UsersFragment || currentFragment instanceof SearchFragment){
+                    break;
+                }else {
+                    replaceViewPagerFragments(COLLECTION_USERS);
+                }
+                break;
+            case R.id.menu_navigation_send:
+                new JournalDB.backupJournalToFile(context, this).execute();
                 break;
             default:
                 break;
@@ -468,6 +495,20 @@ ServerReader.Callback,
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    @Override
+    public void onFileCreated(File file) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Журнал посещений");
+        intent.putExtra(Intent.EXTRA_TEXT, "Отправлено из приложения KR Viewer");
+
+        Uri uri = Uri.fromFile(file);
+        intent.putExtra(Intent.EXTRA_STREAM, uri);
+        startActivity(Intent.createChooser(intent, "Выберите приложение..."));
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -528,14 +569,24 @@ ServerReader.Callback,
     }
 
     private void updateFragments(){
-        Fragment fragment = getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.main_view_pager + ":" + viewPager.getCurrentItem());
+        Fragment fragment = getCurrentFragment();
         if (fragment instanceof LoadRoomFragment){
             LoadRoomFragment.loadRoomsTask().start();
         } else if (fragment instanceof UsersFragment){
             UsersFragment.loadUsersTask().start();
+        } else if (fragment instanceof JournalFragment){
+            try {
+                JournalFragment.loadJournalTask(new SimpleDateFormat("dd MMM yyyy", new Locale("RU", "ru")).parse(spinner.getSelectedItem().toString())).start();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         }
 
         handler.sendEmptyMessage(CLOSE_DRAWER);
+    }
+
+    private Fragment getCurrentFragment(){
+        return getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.main_view_pager + ":" + viewPager.getCurrentItem());
     }
 
     @Override

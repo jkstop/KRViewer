@@ -6,9 +6,9 @@
 
     <string name="navigation_head_account_log_off">Войти</string>
 
-    <string name="menu_navigation_rooms_load">Загруженность помещений</string>
+    <string name="menu_navigation_rooms_load">Загруженность</string>
     <string name="menu_navigation_users">Пользователи</string>
-    <string name="menu_navigation_journal">Журнал</string>
+    <string name="menu_navigation_send">Отправить журнал</string>
     <string name="menu_main_server_status">MSSQL</string>
 
     <string name="title_tab_current_load">Текущая</string>

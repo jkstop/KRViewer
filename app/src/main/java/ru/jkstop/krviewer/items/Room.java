@@ -16,7 +16,6 @@ public class Room {
     private long OpenTime;
     private String UserName;
     private String UserRadioLabel;
-    private String UserPhotoPath;
 
     public Room setName (String name){
         this.Name = name;
@@ -48,11 +47,6 @@ public class Room {
         return this;
     }
 
-    public Room setUserPhotoPath (String userPhotoPath){
-        this.UserPhotoPath = userPhotoPath;
-        return this;
-    }
-
     public String getName(){
         return Name;
     }
@@ -77,8 +71,4 @@ public class Room {
         return UserRadioLabel;
     }
 
-    public String getUserPhotoPath(){
-        if (UserPhotoPath == null) UserPhotoPath = "";
-        return UserPhotoPath;
-    }
 }

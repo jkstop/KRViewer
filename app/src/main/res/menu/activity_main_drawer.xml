@@ -12,4 +12,9 @@
             android:title="@string/menu_navigation_users" />
     </group>
 
+    <item
+        android:id="@id/menu_navigation_send"
+        android:icon="@drawable/ic_send_black_24dp"
+        android:title="@string/menu_navigation_send" />
+
 </menu>

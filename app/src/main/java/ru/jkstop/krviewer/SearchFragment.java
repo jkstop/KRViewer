@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 import ru.jkstop.krviewer.adapters.AdapterUsersList;
 import ru.jkstop.krviewer.databases.UsersDB;
+import ru.jkstop.krviewer.dialogs.DialogUserPhoto;
 import ru.jkstop.krviewer.items.ImageSaver;
 import ru.jkstop.krviewer.items.User;
 
@@ -142,7 +143,7 @@ public class SearchFragment extends Fragment implements RecyclerItemClickListene
                             //Сохраняем фото во временную папку. При выходе папка очищается
                             String photoPath = new ImageSaver(App.getAppContext())
                                     .setFileName(resultSet.getString(ServerConnect.COLUMN_ALL_STAFF_TAG))
-                                    .save(photo, ImageSaver.TEMP);
+                                    .save(photo, ImageSaver.DIRECTORY_TEMP);
                             user.setPhotoPath(photoPath);
 
                         }
@@ -184,6 +185,7 @@ public class SearchFragment extends Fragment implements RecyclerItemClickListene
 
     @Override
     public void onItemClick(View view, int position) {
-        System.out.println("item click " + position);
+        DialogUserPhoto.newInstance(mUsersList.get(position).getInitials(), mUsersList.get(position).getRadioLabel())
+                .show(getChildFragmentManager(), "user_photo");
     }
 }

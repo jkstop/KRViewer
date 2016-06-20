@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 import ru.jkstop.krviewer.adapters.AdapterUsersList;
 import ru.jkstop.krviewer.databases.UsersDB;
+import ru.jkstop.krviewer.dialogs.DialogUserPhoto;
 import ru.jkstop.krviewer.items.User;
 
 /**
@@ -106,6 +107,8 @@ public class UsersFragment extends Fragment implements RecyclerItemClickListener
 
     @Override
     public void onItemClick(View view, int position) {
-        System.out.println("item click " + position);
+
+        DialogUserPhoto.newInstance(mUsersList.get(position).getInitials(), mUsersList.get(position).getRadioLabel())
+                .show(getChildFragmentManager(), "user_photo");
     }
 }

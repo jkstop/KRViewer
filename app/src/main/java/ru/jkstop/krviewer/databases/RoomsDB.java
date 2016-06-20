@@ -18,7 +18,7 @@ import ru.jkstop.krviewer.items.Room;
 public class RoomsDB extends SQLiteOpenHelper implements BaseColumns{
 
     private static final String name = "Rooms.db";
-    private static final int version = 1;
+    private static final int version = 2;
 
     public static final String TABLE_ROOMS = "Помещения";
     public static final String COLUMN_ROOM = "Помещение";
@@ -27,15 +27,13 @@ public class RoomsDB extends SQLiteOpenHelper implements BaseColumns{
     public static final String COLUMN_OPEN_TIME = "Время";
     public static final String COLUMN_USER_NAME = "Пользователь";
     public static final String COLUMN_USER_RADIOLABEL = "Метка";
-    public static final String COLUMN_USER_PHOTO_PATH = "Фото";
     private static final String CREATE_ROOMS_BASE = "CREATE TABLE " + TABLE_ROOMS + " (" + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_ROOM + " text, "
             + COLUMN_STATUS + " integer, "
             + COLUMN_ACCESS + " integer, "
             + COLUMN_OPEN_TIME + " long, "
             + COLUMN_USER_NAME + " text, "
-            + COLUMN_USER_RADIOLABEL + " text, "
-            + COLUMN_USER_PHOTO_PATH + " text);";
+            + COLUMN_USER_RADIOLABEL + " text);";
 
     private static final String DELETE_ROOMS_BASE = "DROP TABLE IF EXISTS " + TABLE_ROOMS;
 
@@ -66,7 +64,6 @@ public class RoomsDB extends SQLiteOpenHelper implements BaseColumns{
                 cv.put(COLUMN_OPEN_TIME, room.getOpenTime());
                 cv.put(COLUMN_USER_NAME, room.getUserName());
                 cv.put(COLUMN_USER_RADIOLABEL, room.getUserRadioLabel());
-                cv.put(COLUMN_USER_PHOTO_PATH, room.getUserPhotoPath());
                 DbShare.getDataBase(DbShare.ROOMS).insert(TABLE_ROOMS, null, cv);
             }
         } catch (Exception e){
@@ -92,7 +89,6 @@ public class RoomsDB extends SQLiteOpenHelper implements BaseColumns{
                 cv.put(COLUMN_USER_NAME, room.getUserName());
                 cv.put(COLUMN_ACCESS, room.getAccess());
                 cv.put(COLUMN_USER_RADIOLABEL, room.getUserRadioLabel());
-                cv.put(COLUMN_USER_PHOTO_PATH, room.getUserPhotoPath());
 
                 DbShare.getDataBase(DbShare.ROOMS).update(TABLE_ROOMS,cv, _ID + "=" + roomPosition, null);
                 return true;
@@ -144,8 +140,7 @@ public class RoomsDB extends SQLiteOpenHelper implements BaseColumns{
                         .setAccess(cursor.getInt(cursor.getColumnIndex(COLUMN_ACCESS)))
                         .setOpenTime(cursor.getLong(cursor.getColumnIndex(COLUMN_OPEN_TIME)))
                         .setUserName(cursor.getString(cursor.getColumnIndex(COLUMN_USER_NAME)))
-                        .setUserRadioLabel(cursor.getString(cursor.getColumnIndex(COLUMN_USER_RADIOLABEL)))
-                        .setUserPhotoPath(cursor.getString(cursor.getColumnIndex(COLUMN_USER_PHOTO_PATH))));
+                        .setUserRadioLabel(cursor.getString(cursor.getColumnIndex(COLUMN_USER_RADIOLABEL))));
             }
 
         } catch (Exception e){

@@ -22,6 +22,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import ru.jkstop.krviewer.databases.RoomsDB;
+import ru.jkstop.krviewer.databases.UsersDB;
 import ru.jkstop.krviewer.items.Room;
 
 /**
@@ -43,6 +44,12 @@ public class LoadRoomFragment extends Fragment implements RecyclerItemClickListe
 
     public static LoadRoomFragment newInstance(){
         return new LoadRoomFragment();
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
     }
 
     @Override
@@ -169,7 +176,7 @@ public class LoadRoomFragment extends Fragment implements RecyclerItemClickListe
                     ((auditroomBusyViewHolder)holder).busyRoomUser.setText(mRoomList.get(position).getUserName());
 
                     Picasso.with(context)
-                            .load(new File(mRoomList.get(position).getUserPhotoPath()))
+                            .load(UsersDB.getUserPhoto(mRoomList.get(position).getUserRadioLabel()))
                             .fit()
                             .centerCrop()
                             .placeholder(R.drawable.ic_user_not_found)

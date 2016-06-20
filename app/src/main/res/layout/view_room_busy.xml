@@ -7,7 +7,7 @@
     app:contentPadding="@dimen/content_default_padding"
     app:cardUseCompatPadding="true"
     android:foreground="?android:attr/selectableItemBackground"
-    app:cardBackgroundColor="#FFE57373">
+    app:cardBackgroundColor="#FF5252">
 
     <android.support.percent.PercentRelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -17,7 +17,7 @@
 
         <android.support.percent.PercentRelativeLayout
             android:id="@id/room_busy_container_image"
-            app:layout_widthPercent="35%"
+            app:layout_widthPercent="30%"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentStart="true">
@@ -51,7 +51,7 @@
                 android:text="456"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_heightPercent="60%"
+                android:textColor="@android:color/black"
                 android:textAppearance="@style/TextAppearance.AppCompat.Display2"
                 android:gravity="center" />
 
@@ -59,12 +59,12 @@
                 android:id="@id/room_busy_text_user"
                 android:text="User user user"
                 android:layout_below="@id/room_busy_text_room"
-                android:maxLines="2"
-                app:layout_heightPercent="40%"
+                android:maxLines="3"
+                android:layout_alignParentBottom="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+                android:gravity="center_horizontal|bottom"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title" />
 
         </android.support.percent.PercentRelativeLayout>
 

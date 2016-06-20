@@ -1,11 +1,17 @@
 package ru.jkstop.krviewer.databases;
 
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Environment;
 import android.provider.BaseColumns;
+import android.widget.Toast;
 
 import java.io.File;
 import java.sql.Time;
@@ -112,7 +118,7 @@ public class JournalDB extends SQLiteOpenHelper implements BaseColumns {
                     COLUMN_ACCOUNT_ID + " =?",
                     new String[]{SharedPrefs.getActiveAccountID()},
                     null,
-                    COLUMN_OPEN_TIME,
+                    COLUMN_OPEN_TIME + " DESC",
                     null);
             if (cursor.getCount()>0){
                 cursor.moveToPosition(-1);
@@ -145,22 +151,18 @@ public class JournalDB extends SQLiteOpenHelper implements BaseColumns {
                     COLUMN_ACCOUNT_ID + " =?",
                     new String[]{SharedPrefs.getActiveAccountID()},
                     null,
-                    COLUMN_OPEN_TIME,
+                    COLUMN_OPEN_TIME + " DESC",
                     null);
             if (cursor.getCount()>0){
+                //если дата не указана, то используем последнюю известную
+                cursor.moveToFirst();
+                if (date == null) date = new Date(cursor.getLong(cursor.getColumnIndex(COLUMN_OPEN_TIME)));
+
                 cursor.moveToPosition(-1);
+
+                System.out.println("start load journal for date " + date);
                 while (cursor.moveToNext()){
-                    if (date!=null){ //если есть дата, то добавляем в список JournalItem с этой датой
-                        if (dateFormat.format(date).equals(dateFormat.format(new Date(cursor.getLong(cursor.getColumnIndex(COLUMN_OPEN_TIME)))))){
-                            items.add(new JournalItem()
-                                    .setRoomName(cursor.getString(cursor.getColumnIndex(COLUMN_ROOM_NAME)))
-                                    .setAccess(cursor.getInt(cursor.getColumnIndex(COLUMN_ACCESS)))
-                                    .setOpenTime(cursor.getLong(cursor.getColumnIndex(COLUMN_OPEN_TIME)))
-                                    .setCloseTime(cursor.getLong(cursor.getColumnIndex(COLUMN_CLOSE_TIME)))
-                                    .setUserName(cursor.getString(cursor.getColumnIndex(COLUMN_USER_NAME)))
-                                    .setUserRadioLabel(cursor.getString(cursor.getColumnIndex(COLUMN_USER_RADIO_LABEL))));
-                        }
-                    } else { //нет даты, возвращаем все
+                    if (dateFormat.format(date).equals(dateFormat.format(new Date(cursor.getLong(cursor.getColumnIndex(COLUMN_OPEN_TIME)))))){
                         items.add(new JournalItem()
                                 .setRoomName(cursor.getString(cursor.getColumnIndex(COLUMN_ROOM_NAME)))
                                 .setAccess(cursor.getInt(cursor.getColumnIndex(COLUMN_ACCESS)))
@@ -328,68 +330,110 @@ public class JournalDB extends SQLiteOpenHelper implements BaseColumns {
         }
     }
 
-    public static  void backupJournalToXLS(){
+    public static class backupJournalToFile extends AsyncTask<Void,Void,Void>{
 
-        File file = new File(App.getAppContext().getFilesDir(),"/Journal.xls");
-        Cursor cursor = null;
+        private ProgressDialog progressDialog;
+        private Context context;
+        private Callback callback;
 
-        WorkbookSettings workbookSettings = new WorkbookSettings();
-        workbookSettings.setLocale(new Locale("ru","RU"));
-        WritableWorkbook workbook;
-        try {
-            ArrayList<String> datesString = getDates();
+        private File outputFile;
 
-            workbook = Workbook.createWorkbook(file,workbookSettings);
-            DateFormat dateFormat = DateFormat.getDateInstance();
+        public backupJournalToFile(Context context, Callback callback){
+            this.context = context;
+            this.callback = callback;
+        }
 
-            if (datesString.size()!=0){
-                cursor = DbShare.getCursor(DbShare.JOURNAL,
-                        TABLE_JOURNAL,
-                        new String[]{COLUMN_ACCOUNT_ID, COLUMN_ROOM_NAME, COLUMN_OPEN_TIME, COLUMN_CLOSE_TIME, COLUMN_USER_NAME},
-                        COLUMN_ACCOUNT_ID + " =?",
-                        new String[]{SharedPrefs.getActiveAccountID()},
-                        null,
-                        null,
-                        null);
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
 
-                for (int i=0;i<datesString.size();i++){
+            progressDialog = new ProgressDialog(context);
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progressDialog.setMessage("Создание файла...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
 
-                    if (cursor.getCount()!=0){
-                        cursor.moveToPosition(-1);
-                        int row=1;
+        @Override
+        protected Void doInBackground(Void... params) {
 
-                        WritableSheet daySheet = workbook.createSheet(datesString.get(i),i);
-                        daySheet.addCell(new Label(0,0,cursor.getColumnName(cursor.getColumnIndex(COLUMN_ROOM_NAME))));
-                        daySheet.addCell(new Label(1,0,cursor.getColumnName(cursor.getColumnIndex(COLUMN_OPEN_TIME))));
-                        daySheet.addCell(new Label(2,0,cursor.getColumnName(cursor.getColumnIndex(COLUMN_CLOSE_TIME))));
-                        daySheet.addCell(new Label(3,0,cursor.getColumnName(cursor.getColumnIndex(COLUMN_USER_NAME))));
+            outputFile = new File(Environment.getExternalStorageDirectory(),"/Journal.xls");
+            Cursor cursor = null;
 
-                        while (cursor.moveToNext()){
-                            if (datesString.get(i).equals(dateFormat.format(new Date(cursor.getLong(cursor.getColumnIndex(COLUMN_OPEN_TIME)))))){
-                                if (SharedPrefs.getActiveAccountID().equals(cursor.getString(cursor.getColumnIndex(COLUMN_ACCOUNT_ID)))){
-                                    daySheet.addCell(new Label(0,row,cursor.getString(cursor.getColumnIndex(COLUMN_ROOM_NAME))));
-                                    daySheet.addCell(new Label(1,row,String.valueOf(new Time(cursor.getLong(cursor.getColumnIndex(COLUMN_OPEN_TIME))))));
-                                    daySheet.addCell(new Label(2,row,String.valueOf(new Time(cursor.getLong(cursor.getColumnIndex(COLUMN_CLOSE_TIME))))));
-                                    daySheet.addCell(new Label(3,row,cursor.getString(cursor.getColumnIndex(COLUMN_USER_NAME))));
-                                    row++;
+            WorkbookSettings workbookSettings = new WorkbookSettings();
+            workbookSettings.setLocale(new Locale("ru","RU"));
+            WritableWorkbook workbook;
+            try {
+                ArrayList<String> datesString = getDates();
+
+                workbook = Workbook.createWorkbook(outputFile, workbookSettings);
+                DateFormat dateFormat = DateFormat.getDateInstance();
+
+                if (datesString.size()!=0){
+                    cursor = DbShare.getCursor(DbShare.JOURNAL,
+                            TABLE_JOURNAL,
+                            new String[]{COLUMN_ACCOUNT_ID, COLUMN_ROOM_NAME, COLUMN_OPEN_TIME, COLUMN_CLOSE_TIME, COLUMN_USER_NAME},
+                            COLUMN_ACCOUNT_ID + " =?",
+                            new String[]{SharedPrefs.getActiveAccountID()},
+                            null,
+                            null,
+                            null);
+
+                    for (int i=0;i<datesString.size();i++){
+
+                        if (cursor.getCount()!=0){
+                            cursor.moveToPosition(-1);
+                            int row=1;
+
+                            WritableSheet daySheet = workbook.createSheet(datesString.get(i),i);
+                            daySheet.addCell(new Label(0,0,cursor.getColumnName(cursor.getColumnIndex(COLUMN_ROOM_NAME))));
+                            daySheet.addCell(new Label(1,0,cursor.getColumnName(cursor.getColumnIndex(COLUMN_OPEN_TIME))));
+                            daySheet.addCell(new Label(2,0,cursor.getColumnName(cursor.getColumnIndex(COLUMN_CLOSE_TIME))));
+                            daySheet.addCell(new Label(3,0,cursor.getColumnName(cursor.getColumnIndex(COLUMN_USER_NAME))));
+
+                            while (cursor.moveToNext()){
+                                if (datesString.get(i).equals(dateFormat.format(new Date(cursor.getLong(cursor.getColumnIndex(COLUMN_OPEN_TIME)))))){
+                                    if (SharedPrefs.getActiveAccountID().equals(cursor.getString(cursor.getColumnIndex(COLUMN_ACCOUNT_ID)))){
+                                        daySheet.addCell(new Label(0,row,cursor.getString(cursor.getColumnIndex(COLUMN_ROOM_NAME))));
+                                        daySheet.addCell(new Label(1,row,String.valueOf(new Time(cursor.getLong(cursor.getColumnIndex(COLUMN_OPEN_TIME))))));
+                                        daySheet.addCell(new Label(2,row,String.valueOf(new Time(cursor.getLong(cursor.getColumnIndex(COLUMN_CLOSE_TIME))))));
+                                        daySheet.addCell(new Label(3,row,cursor.getString(cursor.getColumnIndex(COLUMN_USER_NAME))));
+                                        row++;
+                                    }
                                 }
                             }
                         }
                     }
+                    try {
+                        workbook.write();
+                        workbook.close();
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
                 }
-                try {
-                    workbook.write();
-                    workbook.close();
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                closeCursor(cursor);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            closeCursor(cursor);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (progressDialog.isShowing()){
+                progressDialog.cancel();
+            }
+
+            callback.onFileCreated(outputFile);
+
+
+        }
+
+        public interface Callback{
+            void onFileCreated(File file);
         }
     }
-
 
 }

@@ -7,7 +7,7 @@
     app:contentPadding="@dimen/content_default_padding"
     app:cardUseCompatPadding="true"
     android:foreground="?android:attr/selectableItemBackground"
-    app:cardBackgroundColor="#FF42A5F5">
+    app:cardBackgroundColor="#8BC34A">
 
     <android.support.percent.PercentRelativeLayout
         android:layout_width="match_parent"
@@ -26,7 +26,8 @@
         <TextView
             android:id="@id/room_free_card_text"
             android:text="456"
-            android:textAppearance="@style/TextAppearance.AppCompat.Display2"
+            android:textColor="@android:color/black"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display3"
             android:layout_toEndOf="@id/room_free_card_image"
             android:layout_alignParentTop="true"
             android:layout_width="match_parent"
