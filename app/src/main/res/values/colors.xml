@@ -2,12 +2,10 @@
 <resources>
     <color name="colorPrimary">#009688</color> 27AE60
     <color name="colorPrimaryDark">#00796b</color>
-    <color name="colorPrimaryLight">#B2DFDB</color>
     <color name="colorAccent">#ff4081</color>
 
     <color name="black_alpha_50">#80000000</color>
 
-    <color name="refresh_progress_1">@color/colorPrimaryLight</color>
-    <color name="refresh_progress_2">@color/colorPrimary</color>
-    <color name="refresh_progress_3">@color/colorAccent</color>
+    <color name="free_item">#8BC34A</color>
+    <color name="busy_item">#FF5252</color>
 </resources>

@@ -3,15 +3,12 @@ package ru.jkstop.krviewer.databases;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.BaseColumns;
-import android.widget.Toast;
 
 import java.io.File;
 import java.sql.Time;
@@ -25,8 +22,9 @@ import jxl.WorkbookSettings;
 import jxl.write.Label;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
-import ru.jkstop.krviewer.App;
+import ru.jkstop.krviewer.R;
 import ru.jkstop.krviewer.SharedPrefs;
+import ru.jkstop.krviewer.items.App;
 import ru.jkstop.krviewer.items.JournalItem;
 
 /**
@@ -34,20 +32,17 @@ import ru.jkstop.krviewer.items.JournalItem;
  */
 public class JournalDB extends SQLiteOpenHelper implements BaseColumns {
 
-    public static final int COUNT_TODAY = 2;
-    public static final int COUNT_TOTAL = 3;
-
     private static final String name = "Journal.db";
     private static final int version = 1;
 
-    public static final String TABLE_JOURNAL = "Journal";
-    public static final String COLUMN_ACCOUNT_ID = "id_аккаунта";
-    public static final String COLUMN_ROOM_NAME = "Помещение";
-    public static final String COLUMN_OPEN_TIME = "Вход";
-    public static final String COLUMN_CLOSE_TIME = "Выход";
-    public static final String COLUMN_ACCESS = "Доступ";
-    public static final String COLUMN_USER_NAME = "ФИО";
-    public static final String COLUMN_USER_RADIO_LABEL = "Радиометка";
+    private static final String TABLE_JOURNAL = "Journal";
+    private static final String COLUMN_ACCOUNT_ID = "id_аккаунта";
+    private static final String COLUMN_ROOM_NAME = "Помещение";
+    private static final String COLUMN_OPEN_TIME = "Вход";
+    private static final String COLUMN_CLOSE_TIME = "Выход";
+    private static final String COLUMN_ACCESS = "Доступ";
+    private static final String COLUMN_USER_NAME = "ФИО";
+    private static final String COLUMN_USER_RADIO_LABEL = "Радиометка";
 
     private static final String SQL_CREATE_BASE_JOURNAL = "create table " + TABLE_JOURNAL + " (" + BaseColumns._ID + " integer primary key autoincrement, "
             + COLUMN_ACCOUNT_ID + " text, "
@@ -76,9 +71,9 @@ public class JournalDB extends SQLiteOpenHelper implements BaseColumns {
         onCreate(db);
     }
 
-    public static long addJournalItem(JournalItem journalItem){
+    public static void addJournalItem(JournalItem journalItem){
 
-        SQLiteDatabase mDataBase = DbShare.getDataBase(DbShare.JOURNAL);
+        SQLiteDatabase dataBase = DbShare.getDataBase(DbShare.JOURNAL);
         Cursor cursor = null;
         try {
             ContentValues cv = new ContentValues();
@@ -90,46 +85,35 @@ public class JournalDB extends SQLiteOpenHelper implements BaseColumns {
             cv.put(COLUMN_USER_NAME,journalItem.getUserName());
             cv.put(COLUMN_USER_RADIO_LABEL, journalItem.getUserRadioLabel());
 
-            long position = mDataBase.insert(TABLE_JOURNAL, null, cv);
+            dataBase.insert(TABLE_JOURNAL, null, cv);
 
             cursor = DbShare.getCursor(DbShare.JOURNAL,
                     TABLE_JOURNAL,
                     new String[]{COLUMN_OPEN_TIME},
-                    null, null, null, null, null);
+                    null, null, null, null);
 
-            return position;
         }catch (Exception e){
             e.printStackTrace();
-            return -1;
         }finally {
             closeCursor(cursor);
         }
     }
 
-    public static ArrayList<Long> getJournalItemsOpenTime(Date date){
-        DateFormat dateFormat = DateFormat.getDateInstance();
+    public static ArrayList<Long> getJournalItemsOpenTime(){
         ArrayList <Long> items = new ArrayList<>();
         Cursor cursor = null;
         try {
-
             cursor = DbShare.getCursor(DbShare.JOURNAL,
                     TABLE_JOURNAL,
                     new String[]{COLUMN_OPEN_TIME},
                     COLUMN_ACCOUNT_ID + " =?",
                     new String[]{SharedPrefs.getActiveAccountID()},
-                    null,
                     COLUMN_OPEN_TIME + " DESC",
                     null);
             if (cursor.getCount()>0){
                 cursor.moveToPosition(-1);
                 while (cursor.moveToNext()){
-                    if (date!=null){ //возвращаем тэги (они же время входа) на указанную дату
-                        if (dateFormat.format(date).equals(dateFormat.format(new Date(cursor.getLong(cursor.getColumnIndex(COLUMN_OPEN_TIME)))))){
-                            items.add(cursor.getLong(cursor.getColumnIndex(COLUMN_OPEN_TIME)));
-                        }
-                    } else { //если дата не указана, то возвращаем все
-                        items.add(cursor.getLong(cursor.getColumnIndex(COLUMN_OPEN_TIME)));
-                    }
+                    items.add(cursor.getLong(cursor.getColumnIndex(COLUMN_OPEN_TIME)));
                 }
             }
         }catch (Exception e){
@@ -150,7 +134,6 @@ public class JournalDB extends SQLiteOpenHelper implements BaseColumns {
                     null,
                     COLUMN_ACCOUNT_ID + " =?",
                     new String[]{SharedPrefs.getActiveAccountID()},
-                    null,
                     COLUMN_OPEN_TIME + " DESC",
                     null);
             if (cursor.getCount()>0){
@@ -160,7 +143,6 @@ public class JournalDB extends SQLiteOpenHelper implements BaseColumns {
 
                 cursor.moveToPosition(-1);
 
-                System.out.println("start load journal for date " + date);
                 while (cursor.moveToNext()){
                     if (dateFormat.format(date).equals(dateFormat.format(new Date(cursor.getLong(cursor.getColumnIndex(COLUMN_OPEN_TIME)))))){
                         items.add(new JournalItem()
@@ -190,7 +172,7 @@ public class JournalDB extends SQLiteOpenHelper implements BaseColumns {
                     new String[]{COLUMN_OPEN_TIME},
                     COLUMN_CLOSE_TIME + " =?",
                     new String[]{"0"},
-                    null, null, null);
+                    null, null);
             cursor.moveToPosition(-1);
             while (cursor.moveToNext()){
                 items.add(cursor.getLong(cursor.getColumnIndex(COLUMN_OPEN_TIME)));
@@ -204,41 +186,6 @@ public class JournalDB extends SQLiteOpenHelper implements BaseColumns {
         return items;
     }
 
-    public static int getCount(int type){
-        int count = 0;
-        DateFormat dateFormat = DateFormat.getDateInstance();
-        Cursor cursor = null;
-        try {
-            cursor = DbShare.getCursor(DbShare.JOURNAL,
-                    TABLE_JOURNAL,
-                    new String[]{COLUMN_OPEN_TIME},
-                    COLUMN_ACCOUNT_ID + " =?",
-                    new String[]{SharedPrefs.getActiveAccountID()},
-                    null,
-                    null,
-                    null);
-            if (cursor.getCount()>0){
-                cursor.moveToPosition(-1);
-                if (type == COUNT_TODAY){
-                    String today = dateFormat.format(new Date(System.currentTimeMillis()));
-                    while (cursor.moveToNext()){
-                        if (dateFormat.format(new Date(cursor.getLong(cursor.getColumnIndex(COLUMN_OPEN_TIME))))
-                                .equals(today)){
-                            count++;
-                        }
-                    }
-                } else {
-                    count = cursor.getCount();
-                }
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }finally {
-            closeCursor(cursor);
-        }
-        return count;
-    }
-
     public static ArrayList<String> getDates(){
         DateFormat dateFormat = DateFormat.getDateInstance();
         final ArrayList <String> items = new ArrayList<>();
@@ -249,7 +196,6 @@ public class JournalDB extends SQLiteOpenHelper implements BaseColumns {
                     new String[]{COLUMN_OPEN_TIME},
                     COLUMN_ACCOUNT_ID + " =?",
                     new String[]{SharedPrefs.getActiveAccountID()},
-                    null,
                     COLUMN_OPEN_TIME + " DESC",
                     null);
             if (cursor.getCount()>0){
@@ -271,7 +217,7 @@ public class JournalDB extends SQLiteOpenHelper implements BaseColumns {
     }
 
     public static void updateItem (Long openTime, Long closeTine){
-        SQLiteDatabase mDataBase = DbShare.getDataBase(DbShare.JOURNAL);
+        SQLiteDatabase dataBase = DbShare.getDataBase(DbShare.JOURNAL);
         Cursor cursor;
         ContentValues cv = new ContentValues();
         try {
@@ -281,19 +227,18 @@ public class JournalDB extends SQLiteOpenHelper implements BaseColumns {
                     COLUMN_OPEN_TIME + " =?",
                     new String[]{String.valueOf(openTime)},
                     null,
-                    null,
                     "1");
             cursor.moveToFirst();
 
             cv.put(COLUMN_CLOSE_TIME, closeTine);
-            mDataBase.update(TABLE_JOURNAL, cv, _ID + "=" + cursor.getInt(cursor.getColumnIndex(_ID)), null);
+            dataBase.update(TABLE_JOURNAL, cv, _ID + "=" + cursor.getInt(cursor.getColumnIndex(_ID)), null);
         } catch (Exception e){
             e.printStackTrace();
         }
     }
 
     public static void deleteItem (long openTime){
-        SQLiteDatabase mDataBase = DbShare.getDataBase(DbShare.JOURNAL);
+        SQLiteDatabase dataBase = DbShare.getDataBase(DbShare.JOURNAL);
         Cursor cursor = null;
         try {
             cursor = DbShare.getCursor(DbShare.JOURNAL,
@@ -302,11 +247,10 @@ public class JournalDB extends SQLiteOpenHelper implements BaseColumns {
                     COLUMN_OPEN_TIME + " =?",
                     new String[]{String.valueOf(openTime)},
                     null,
-                    null,
                     "1");
             if (cursor.getCount()>0){
                 cursor.moveToFirst();
-                mDataBase.delete(TABLE_JOURNAL, _ID + "=" + cursor.getInt(cursor.getColumnIndex(_ID)), null);
+                dataBase.delete(TABLE_JOURNAL, _ID + "=" + cursor.getInt(cursor.getColumnIndex(_ID)), null);
             }
 
         } catch (Exception e){
@@ -322,9 +266,9 @@ public class JournalDB extends SQLiteOpenHelper implements BaseColumns {
     }
 
     public static void clear(){
-        SQLiteDatabase mDataBase = DbShare.getDataBase(DbShare.JOURNAL);
+        SQLiteDatabase dataBase = DbShare.getDataBase(DbShare.JOURNAL);
         try {
-            mDataBase.delete(TABLE_JOURNAL, null, null);
+            dataBase.delete(TABLE_JOURNAL, null, null);
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -349,7 +293,7 @@ public class JournalDB extends SQLiteOpenHelper implements BaseColumns {
 
             progressDialog = new ProgressDialog(context);
             progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            progressDialog.setMessage("Создание файла...");
+            progressDialog.setMessage(App.getAppContext().getString(R.string.send_mail_file_creating));
             progressDialog.setCancelable(false);
             progressDialog.show();
         }
@@ -375,7 +319,6 @@ public class JournalDB extends SQLiteOpenHelper implements BaseColumns {
                             new String[]{COLUMN_ACCOUNT_ID, COLUMN_ROOM_NAME, COLUMN_OPEN_TIME, COLUMN_CLOSE_TIME, COLUMN_USER_NAME},
                             COLUMN_ACCOUNT_ID + " =?",
                             new String[]{SharedPrefs.getActiveAccountID()},
-                            null,
                             null,
                             null);
 

@@ -22,7 +22,6 @@
     <item name="menu_navigation_send" type="id"/>
     <item name="menu_main_server_status" type="id"/>
 
-    <item name="main_fragment_frame" type="id"/>
     <item name="main_recycler" type="id"/>
     <item name="main_view_pager" type="id"/>
     <item name="main_progress_bar" type="id"/>
@@ -32,7 +31,6 @@
     <item name="dialog_sql_setting_reconnect" type="id"/>
 
     <item name="user_card" type="id"/>
-    <item name="user_card_info_layout" type="id"/>
     <item name="user_card_initials" type="id"/>
     <item name="user_card_division" type="id"/>
     <item name="user_card_photo" type="id"/>
@@ -49,6 +47,7 @@
     <item name="room_busy_text_user" type="id"/>
 
     <item name="journal_card" type="id"/>
+    <item name="journal_card_user_container" type="id"/>
     <item name="journal_card_room" type="id"/>
     <item name="journal_card_photo_container" type="id"/>
     <item name="journal_card_photo" type="id"/>
@@ -57,9 +56,7 @@
     <item name="journal_card_time_out" type="id"/>
     <item name="journal_card_time_icon" type="id"/>
     <item name="journal_card_access_icon" type="id"/>
-    <item name="journal_card_delete" type="id"/>
 
     <item name="user_photo_toolbar" type="id"/>
     <item name="user_photo_image_container" type="id"/>
-    <item name="user_photo_load_progress" type="id"/>
 </resources>

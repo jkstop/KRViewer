@@ -37,6 +37,7 @@ public class ServerConnect {
     public static final String COLUMN_PERSONS_ACCESS = "ACCESS";
     public static final String COLUMN_PERSONS_PHOTO_BASE64 = "PHOTO_BASE64";
 
+    public static final String COLUMN_ROOM_ACCOUNT_ID = "ACCOUNT_ID";
     public static final String COLUMN_ROOMS_ROOM = "ROOM";
     public static final String COLUMN_ROOMS_STATUS = "STATUS";
     public static final String COLUMN_ROOMS_ACCESS = "ACCESS";
@@ -53,38 +54,38 @@ public class ServerConnect {
     public static final String COLUMN_ALL_STAFF_PHOTO = "PHOTO";
     public static final String COLUMN_ALL_STAFF_TAG = "RADIO_LABEL";
 
-    private static Connection SQLconnect;
+    private static Connection sqlconnect;
     private static Thread connectThread;
-    private static int mCallingTask;
+    private static int callingTask;
 
-    private static String mServerName;
-    private static Callback mCallback;
+    private static String serverName;
+    private static Callback callback;
 
     private static final String NET_SOURCEFORGE_JTDS_JDBC_DRIVER = "net.sourceforge.jtds.jdbc.Driver";
     private static final String DB = "KeyRegistratorBase";
 
     public ServerConnect(String serverName, Callback callback){
-        mServerName = serverName;
-        mCallback = callback;
+        ServerConnect.serverName = serverName;
+        ServerConnect.callback = callback;
     }
 
 
     public static void getConnection(String serverName, int callingTask, @Nullable Callback callback){
-        mServerName = serverName;
-        mCallback = callback;
-        mCallingTask = callingTask;
+        ServerConnect.serverName = serverName;
+        ServerConnect.callback = callback;
+        ServerConnect.callingTask = callingTask;
 
-        System.out.println("SQL CONNECT " + SQLconnect);
+        System.out.println("SQL CONNECT " + sqlconnect);
         System.out.println("THREAD " + connectThread);
 
         try {
             if (serverName == null){
-                if (SQLconnect!=null && !SQLconnect.isClosed()){
-                    callback.onServerConnected(SQLconnect, mCallingTask);
+                if (sqlconnect !=null && !sqlconnect.isClosed()){
+                    callback.onServerConnected(sqlconnect, ServerConnect.callingTask);
                 } else {
                     if (connectThread == null){
                         connectThread = new Thread(null, getConnect, "MSSQLServerConnect");
-                        mServerName = SharedPrefs.getServerName();
+                        ServerConnect.serverName = SharedPrefs.getServerName();
 
                         connectThread.start();
                     }
@@ -101,13 +102,12 @@ public class ServerConnect {
     }
 
     public static void closeConnection(){
-        System.out.println("try close connection");
-        if (SQLconnect!=null){
+        if (sqlconnect !=null){
             new Thread(new Runnable() {
                     @Override
                     public void run() {
                         try {
-                            SQLconnect.close();
+                            sqlconnect.close();
                         } catch (SQLException e) {
                             e.printStackTrace();
                         }
@@ -119,7 +119,7 @@ public class ServerConnect {
     private static Runnable getConnect = new Runnable() {
         @Override
         public void run() {
-            getConnectionFromUrl(mServerName, mCallback);
+            getConnectionFromUrl(serverName, callback);
         }
     };
 
@@ -135,8 +135,8 @@ public class ServerConnect {
             final String ConnURL = "jdbc:jtds:sqlserver://" + serverName + ";"
                     + "database=" + DB +";user=shsupport;password=podderzhka;loginTimeout=3";
             connectThread = null;
-            SQLconnect = DriverManager.getConnection(ConnURL);
-            if (callback!=null) callback.onServerConnected(SQLconnect, mCallingTask);
+            sqlconnect = DriverManager.getConnection(ConnURL);
+            if (callback!=null) callback.onServerConnected(sqlconnect, callingTask);
         } catch (Exception e) {
             e.printStackTrace();
             if (callback!=null) callback.onServerConnectException(e);

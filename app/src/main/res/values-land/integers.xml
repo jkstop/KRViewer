@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="columns_load_rooms">2</integer>
+    <integer name="columns_users">2</integer>
+    <integer name="columns_journal">2</integer>
+    <integer name="columns_search">2</integer>
+</resources>

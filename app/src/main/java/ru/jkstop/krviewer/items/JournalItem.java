@@ -1,72 +1,72 @@
 package ru.jkstop.krviewer.items;
 
 /**
- * Created by ivsmirnov on 16.06.2016.
+ * Запись журнала
  */
 public class JournalItem {
 
-    private String RoomName;
-    private long OpenTime;
-    private long CloseTime;
-    private int Access;
-    private String UserName;
-    private String UserRadioLabel;
+    private String roomName;
+    private long openTime;
+    private long closeTime;
+    private int access;
+    private String userName;
+    private String userRadioLabel;
 
     public JournalItem setUserRadioLabel(String tag){
-        this.UserRadioLabel = tag;
+        this.userRadioLabel = tag;
         return this;
     }
 
     public String getUserRadioLabel(){
-        return UserRadioLabel;
+        return userRadioLabel;
     }
 
     public JournalItem setUserName(String initials){
-        this.UserName = initials;
+        this.userName = initials;
         return this;
     }
 
     public String getUserName(){
-        return UserName;
+        return userName;
     }
 
 
     public JournalItem setRoomName(String roomName){
-        this.RoomName = roomName;
+        this.roomName = roomName;
         return this;
     }
 
     public String getRoomName(){
-        return RoomName;
+        return roomName;
     }
 
     public JournalItem setOpenTime(Long openTime){
         if (openTime == null) openTime = (long) 0;
-        this.OpenTime = openTime;
+        this.openTime = openTime;
         return this;
 
     }
 
     public JournalItem setCloseTime(Long closeTime){
         if (closeTime == null) closeTime = (long) 0;
-        this.CloseTime = closeTime;
+        this.closeTime = closeTime;
         return this;
     }
 
     public Long getOpenTime(){
-        return OpenTime;
+        return openTime;
     }
 
     public Long getCloseTime(){
-        return CloseTime;
+        return closeTime;
     }
 
     public JournalItem setAccess(int access){
-        this.Access = access;
+        this.access = access;
         return this;
     }
 
     public int getAccess(){
-        return Access;
+        return access;
     }
 }

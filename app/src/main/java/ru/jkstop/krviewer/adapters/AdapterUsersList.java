@@ -1,12 +1,10 @@
 package ru.jkstop.krviewer.adapters;
 
 import android.content.Context;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -16,24 +14,20 @@ import java.io.File;
 import java.util.ArrayList;
 
 import ru.jkstop.krviewer.R;
-import ru.jkstop.krviewer.RecyclerItemClickListener;
+import ru.jkstop.krviewer.interfaces.RecyclerItemClickListener;
 import ru.jkstop.krviewer.items.User;
 
 public class AdapterUsersList extends RecyclerView.Adapter<AdapterUsersList.ViewHolder>{
 
-    public static final int SHOW_LOCAL_USERS = 0;
-    public static final int SHOW_SERVER_USERS = 1;
+    private ArrayList <User> userList;
 
-    private ArrayList <User> mUsersList;
-    private int mType;
-    private Context mContext;
-    private RecyclerItemClickListener mClickListener;
+    private Context context;
+    private RecyclerItemClickListener itemClickListener;
 
-    public AdapterUsersList(Context c, ArrayList<User> usersList, int type, RecyclerItemClickListener listener) {
-        mUsersList = usersList;
-        mContext = c;
-        mType = type;
-        mClickListener = listener;
+    public AdapterUsersList(Context c, ArrayList<User> usersList, RecyclerItemClickListener listener) {
+        userList = usersList;
+        context = c;
+        itemClickListener = listener;
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder{
@@ -55,7 +49,7 @@ public class AdapterUsersList extends RecyclerView.Adapter<AdapterUsersList.View
         rowView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mClickListener.onItemClick(v, viewHolder.getLayoutPosition());
+                itemClickListener.onItemClick(viewHolder.getLayoutPosition());
             }
         });
         return viewHolder;
@@ -65,20 +59,20 @@ public class AdapterUsersList extends RecyclerView.Adapter<AdapterUsersList.View
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
 
-        holder.userInitials.setText(mUsersList.get(position).getInitials());
-        holder.userDivision.setText(mUsersList.get(position).getDivision());
+        holder.userInitials.setText(userList.get(position).getInitials());
+        holder.userDivision.setText(userList.get(position).getDivision());
 
-        Picasso.with(mContext)
-                .load(new File(mUsersList.get(position).getPhotoPath()))
+        Picasso.with(context)
+                .load(new File(userList.get(position).getPhotoPath()))
                 .fit()
                 .centerCrop()
-                .placeholder(R.drawable.ic_user_not_found)
+                .placeholder(R.drawable.img_user_not_found)
                 .into(holder.userImage);
     }
 
     @Override
     public int getItemCount() {
-        return mUsersList.size();
+        return userList.size();
     }
 
 }

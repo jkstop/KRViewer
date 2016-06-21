@@ -15,7 +15,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
 
-import ru.jkstop.krviewer.App;
+import ru.jkstop.krviewer.items.App;
 import ru.jkstop.krviewer.R;
 import ru.jkstop.krviewer.SharedPrefs;
 import ru.jkstop.krviewer.items.ImageSaver;
@@ -29,12 +29,12 @@ public class UsersDB extends SQLiteOpenHelper implements BaseColumns {
     private static final String name = "Users.db";
     private static final int version = 2;
 
-    public static final String TABLE_USERS = "Пользователи";
-    public static final String COLUMN_ACCOUNT_UD = "ID_Пользователя";
-    public static final String COLUMN_INITIALS = "ФИО";
-    public static final String COLUMN_DIVISION = "Подразделение";
-    public static final String COLUMN_RADIO_LABEL = "Радиометка";
-    public static final String COLUMN_PHOTO_PATH = "Фото";
+    private static final String TABLE_USERS = "Пользователи";
+    private static final String COLUMN_ACCOUNT_UD = "ID_Пользователя";
+    private static final String COLUMN_INITIALS = "ФИО";
+    private static final String COLUMN_DIVISION = "Подразделение";
+    private static final String COLUMN_RADIO_LABEL = "Радиометка";
+    private static final String COLUMN_PHOTO_PATH = "Фото";
 
     private static final String SQL_CREATE_USERS_BASE = "create table " + TABLE_USERS + " (" + BaseColumns._ID + " integer primary key autoincrement, "
             + COLUMN_ACCOUNT_UD + " text, "
@@ -45,9 +45,6 @@ public class UsersDB extends SQLiteOpenHelper implements BaseColumns {
 
     private static final String SQL_DELETE_USERS_BASE = "DROP TABLE IF EXISTS "
             + TABLE_USERS;
-
-    public static final int SHORT_INITIALS = 10;
-    public static final int FULL_INITIALS = 11;
 
     public UsersDB(Context context) {
         super(context,name, null, version);
@@ -62,7 +59,6 @@ public class UsersDB extends SQLiteOpenHelper implements BaseColumns {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL(SQL_DELETE_USERS_BASE);
         onCreate(db);
-        //update transaction
     }
 
     public static User getUser (String tag){
@@ -73,7 +69,6 @@ public class UsersDB extends SQLiteOpenHelper implements BaseColumns {
                     null,
                     COLUMN_RADIO_LABEL + " =?",
                     new String[]{tag},
-                    null,
                     null,
                     "1");
 
@@ -105,7 +100,6 @@ public class UsersDB extends SQLiteOpenHelper implements BaseColumns {
                     null,
                     null,
                     null,
-                    null,
                     COLUMN_INITIALS + " ASC",
                     null);
 
@@ -134,7 +128,7 @@ public class UsersDB extends SQLiteOpenHelper implements BaseColumns {
             cursor = DbShare.getCursor(DbShare.USERS,
                     TABLE_USERS,
                     new String[]{COLUMN_RADIO_LABEL},
-                    null,null,null,null,null);
+                    null,null, null,null);
             cursor.moveToPosition(-1);
             while (cursor.moveToNext()){
                 items.add(cursor.getString(cursor.getColumnIndex(COLUMN_RADIO_LABEL)));
@@ -148,7 +142,7 @@ public class UsersDB extends SQLiteOpenHelper implements BaseColumns {
         }
     }
 
-    public static boolean addUser (@NonNull User user) {
+    public static void addUser (@NonNull User user) {
         try {
             //если пользователь уже есть в базе, то обновляем запись
             if (isUserInBase(user.getRadioLabel())){
@@ -175,10 +169,9 @@ public class UsersDB extends SQLiteOpenHelper implements BaseColumns {
         } catch (Exception e){
             e.printStackTrace();
         }
-        return false;
     }
 
-    public static void updateUser(@NonNull User user){
+    private static void updateUser(@NonNull User user){
         Cursor cursor = null;
         try {
             cursor = DbShare.getCursor(DbShare.USERS,
@@ -186,7 +179,6 @@ public class UsersDB extends SQLiteOpenHelper implements BaseColumns {
                     null,
                     COLUMN_RADIO_LABEL + " =?",
                     new String[]{user.getRadioLabel()},
-                    null,
                     null,
                     null);
             if (cursor.getCount()>0){
@@ -227,8 +219,7 @@ public class UsersDB extends SQLiteOpenHelper implements BaseColumns {
                         new String[]{COLUMN_PHOTO_PATH},
                         COLUMN_RADIO_LABEL + " =?",
                         new String[]{userRadioLabel},
-                        null,
-                        null,
+                    null,
                         "1");
 
                 if (cursor.getCount()>0){
@@ -258,7 +249,6 @@ public class UsersDB extends SQLiteOpenHelper implements BaseColumns {
                     COLUMN_RADIO_LABEL + " =?",
                     new String[]{userRadioLabel},
                     null,
-                    null,
                     null);
 
             if (cursor.getCount()>0){
@@ -276,7 +266,7 @@ public class UsersDB extends SQLiteOpenHelper implements BaseColumns {
         }
     }
 
-    public static boolean isUserInBase(String radioLabel){
+    private static boolean isUserInBase(String radioLabel){
         Cursor cursor = null;
         try {
             cursor = DbShare.getCursor(DbShare.USERS,
@@ -284,7 +274,6 @@ public class UsersDB extends SQLiteOpenHelper implements BaseColumns {
                     new String[]{COLUMN_RADIO_LABEL},
                     COLUMN_RADIO_LABEL + " =?",
                     new String[]{radioLabel},
-                    null,
                     null,
                     "1");
             return cursor.getCount() > 0;
@@ -297,7 +286,7 @@ public class UsersDB extends SQLiteOpenHelper implements BaseColumns {
 
     public static String getBinaryDefaultPhoto(){
         try {
-            Bitmap bitmap = BitmapFactory.decodeResource(App.getAppContext().getResources(), R.drawable.ic_user_not_found);
+            Bitmap bitmap = BitmapFactory.decodeResource(App.getAppContext().getResources(), R.drawable.img_user_not_found);
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.WEBP,100,byteArrayOutputStream);
             byte[] byteArray = byteArrayOutputStream.toByteArray();
@@ -327,37 +316,18 @@ public class UsersDB extends SQLiteOpenHelper implements BaseColumns {
         }
     }
 
-    public static String createUserInitials (int initialsType, String lastname, String firstname, String midname){
+    public static String createUserInitials (String lastname, String firstname, String midname){
         String initials = "";
-        switch (initialsType){
-            case SHORT_INITIALS:
-                if (lastname != null && firstname != null && midname != null && firstname.length() != 0 && midname.length() != 0) {
-                    initials = lastname + " " + firstname.charAt(0) + "." + midname.charAt(0) + ".";
-                } else {
-                    if (lastname != null && firstname != null) {
-                        initials = lastname + " " + firstname;
-                    } else {
-                        if (lastname != null) {
-                            initials = lastname;
-                        }
-                    }
+        if (lastname != null && firstname != null && midname != null) {
+            initials = lastname + " " + firstname + " " + midname;
+        } else {
+            if (lastname != null && firstname != null) {
+                initials = lastname + " " + firstname;
+            } else {
+                if (lastname != null) {
+                    initials = lastname;
                 }
-                break;
-            case FULL_INITIALS:
-                if (lastname != null && firstname != null && midname != null) {
-                    initials = lastname + " " + firstname + " " + midname;
-                } else {
-                    if (lastname != null && firstname != null) {
-                        initials = lastname + " " + firstname;
-                    } else {
-                        if (lastname != null) {
-                            initials = lastname;
-                        }
-                    }
-                }
-                break;
-            default:
-                break;
+            }
         }
         return initials;
 

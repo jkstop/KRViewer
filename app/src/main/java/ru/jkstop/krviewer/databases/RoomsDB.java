@@ -20,13 +20,13 @@ public class RoomsDB extends SQLiteOpenHelper implements BaseColumns{
     private static final String name = "Rooms.db";
     private static final int version = 2;
 
-    public static final String TABLE_ROOMS = "Помещения";
-    public static final String COLUMN_ROOM = "Помещение";
-    public static final String COLUMN_STATUS = "Статус";
-    public static final String COLUMN_ACCESS = "Доступ";
-    public static final String COLUMN_OPEN_TIME = "Время";
-    public static final String COLUMN_USER_NAME = "Пользователь";
-    public static final String COLUMN_USER_RADIOLABEL = "Метка";
+    private static final String TABLE_ROOMS = "Помещения";
+    private static final String COLUMN_ROOM = "Помещение";
+    private static final String COLUMN_STATUS = "Статус";
+    private static final String COLUMN_ACCESS = "Доступ";
+    private static final String COLUMN_OPEN_TIME = "Время";
+    private static final String COLUMN_USER_NAME = "Пользователь";
+    private static final String COLUMN_USER_RADIOLABEL = "Метка";
     private static final String CREATE_ROOMS_BASE = "CREATE TABLE " + TABLE_ROOMS + " (" + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_ROOM + " text, "
             + COLUMN_STATUS + " integer, "
@@ -71,7 +71,7 @@ public class RoomsDB extends SQLiteOpenHelper implements BaseColumns{
         }
     }
 
-    public static boolean updateRoom(Room room){
+    public static void updateRoom(Room room){
         try {
             String roomPosition;
             if (room.getName() != null){
@@ -91,12 +91,11 @@ public class RoomsDB extends SQLiteOpenHelper implements BaseColumns{
                 cv.put(COLUMN_USER_RADIOLABEL, room.getUserRadioLabel());
 
                 DbShare.getDataBase(DbShare.ROOMS).update(TABLE_ROOMS,cv, _ID + "=" + roomPosition, null);
-                return true;
+
             }
         }catch (Exception e){
             e.printStackTrace();
         }
-     return false;
     }
 
     public static void deleteRoom (String roomName){
@@ -107,7 +106,6 @@ public class RoomsDB extends SQLiteOpenHelper implements BaseColumns{
                     new String[]{_ID, COLUMN_ROOM},
                     COLUMN_ROOM + " =?",
                     new String[]{roomName},
-                    null,
                     null,
                     "1");
             cursor.moveToPosition(-1);
@@ -129,7 +127,7 @@ public class RoomsDB extends SQLiteOpenHelper implements BaseColumns{
         try {
             cursor = DbShare.getCursor(DbShare.ROOMS,
                     TABLE_ROOMS,
-                    null,null,null,null,
+                    null,null,null,
                     COLUMN_ROOM + " ASC",
                     null);
             cursor.moveToPosition(-1);
@@ -151,32 +149,7 @@ public class RoomsDB extends SQLiteOpenHelper implements BaseColumns{
         return rooms;
     }
 
-    public static ArrayList<String> getRoomsNamesList(){
-        Cursor cursor = null;
-        ArrayList<String> items = new ArrayList<>();
-        try {
-
-            cursor = DbShare.getCursor(DbShare.ROOMS,
-                    TABLE_ROOMS,
-                    new String[]{COLUMN_ROOM},
-                    null,
-                    null,
-                    null,
-                    COLUMN_ROOM + " ASC",
-                    null);
-            cursor.moveToPosition(-1);
-            while (cursor.moveToNext()){
-                items.add(cursor.getString(cursor.getColumnIndex(COLUMN_ROOM)));
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-        } finally {
-            closeCursor(cursor);
-        }
-        return items;
-    }
-
-    public static boolean isRoomAlreadyInBase (String roomName){
+    private static boolean isRoomAlreadyInBase(String roomName){
         Cursor cursor = null;
         try {
             cursor = DbShare.getCursor(DbShare.ROOMS,
@@ -184,7 +157,6 @@ public class RoomsDB extends SQLiteOpenHelper implements BaseColumns{
                     new String[]{COLUMN_ROOM},
                     COLUMN_ROOM + " =?",
                     new String[]{roomName},
-                    null,
                     null,
                     "1");
             return cursor.getCount() > 0;
@@ -202,7 +174,6 @@ public class RoomsDB extends SQLiteOpenHelper implements BaseColumns{
                     new String[]{COLUMN_STATUS},
                     COLUMN_ROOM + " =?",
                     new String[]{roomName},
-                    null,
                     null,
                     "1");
             if (cursor.getCount()>0){
@@ -224,7 +195,6 @@ public class RoomsDB extends SQLiteOpenHelper implements BaseColumns{
                     new String[]{COLUMN_OPEN_TIME},
                     COLUMN_ROOM + " =?",
                     new String[]{roomName},
-                    null,
                     null,
                     "1");
             if (cursor.getCount()>0){

@@ -4,17 +4,17 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@id/menu_navigation_rooms_load"
-            android:icon="@drawable/ic_assessment_black_24dp"
+            android:icon="@drawable/ic_stat_24dp"
             android:title="@string/menu_navigation_rooms_load" />
         <item
             android:id="@id/menu_navigation_users"
-            android:icon="@drawable/ic_account_box_black_24dp"
+            android:icon="@drawable/ic_persons_24dp"
             android:title="@string/menu_navigation_users" />
     </group>
 
     <item
         android:id="@id/menu_navigation_send"
-        android:icon="@drawable/ic_send_black_24dp"
+        android:icon="@drawable/ic_share_24dp"
         android:title="@string/menu_navigation_send" />
 
 </menu>

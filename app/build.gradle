@@ -2,14 +2,16 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    buildToolsVersion '23.0.3'
 
     defaultConfig {
         applicationId "ru.jkstop.krviewer"
         minSdkVersion 17
         targetSdkVersion 23
+        vectorDrawables.useSupportLibrary = true
         versionCode 1
         versionName "1.0"
+
     }
     buildTypes {
         release {

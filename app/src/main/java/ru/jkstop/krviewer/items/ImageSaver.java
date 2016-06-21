@@ -9,25 +9,23 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import ru.jkstop.krviewer.App;
-
 /**
  * Сохранение фото пользователей во внутреннее хранилище
  */
 public class ImageSaver {
 
-    private Context mContext;
-    private String mFileName;
+    private Context context;
+    private String fileName;
 
     public static final String DIRECTORY_TEMP = "/Temp";
     public static final String PREFIX_WEBP = ".webp";
 
     public ImageSaver(Context context) {
-        mContext = context;
+        this.context = context;
     }
 
     public ImageSaver setFileName (String fileName){
-        mFileName = fileName + PREFIX_WEBP;
+        this.fileName = fileName + PREFIX_WEBP;
         return this;
     }
 
@@ -60,11 +58,11 @@ public class ImageSaver {
 
     private File createFile(String customDir){
         if (customDir == null){
-            return new File(mContext.getFilesDir(), mFileName);
+            return new File(context.getFilesDir(), fileName);
         } else {
-            File customPath = new File(mContext.getFilesDir() + customDir);
+            File customPath = new File(context.getFilesDir() + customDir);
             customPath.mkdirs();
-            return new File(customPath, mFileName);
+            return new File(customPath, fileName);
         }
     }
 

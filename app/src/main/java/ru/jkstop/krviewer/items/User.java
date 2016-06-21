@@ -4,55 +4,55 @@ package ru.jkstop.krviewer.items;
  * Пользователь
  */
 public class User {
-    private String Initials;
-    private String Division;
-    private String PhotoPath;
-    private String RadioLabel;
-    private String PhotoBinary;
+    private String initials;
+    private String division;
+    private String photoPath;
+    private String radioLabel;
+    private String photoBinary;
 
     public User setInitials (String initials){
-        this.Initials = initials;
+        this.initials = initials;
         return this;
     }
 
     public User setDivision (String division){
-        this.Division = division;
+        this.division = division;
         return this;
     }
 
     public User setPhotoPath (String photoPath){
-        this.PhotoPath = photoPath;
+        this.photoPath = photoPath;
         return this;
     }
 
     public User setRadioLabel (String radioLabel){
-        this.RadioLabel = radioLabel;
+        this.radioLabel = radioLabel;
         return this;
     }
 
     public User setPhotoBinary (String photoBinary){
-        this.PhotoBinary = photoBinary;
+        this.photoBinary = photoBinary;
         return this;
     }
 
     public String getInitials(){
-        return Initials;
+        return initials;
     }
 
     public String getDivision(){
-        return Division;
+        return division;
     }
 
     public String getPhotoPath(){
-        if (PhotoPath == null) PhotoPath = "";
-        return PhotoPath;
+        if (photoPath == null) photoPath = "";
+        return photoPath;
     }
 
     public String getRadioLabel(){
-        return RadioLabel;
+        return radioLabel;
     }
 
     public String getPhotoBinary(){
-        return PhotoBinary;
+        return photoBinary;
     }
 }

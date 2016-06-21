@@ -1,7 +1,7 @@
 package ru.jkstop.krviewer.items;
 
 /**
- * Created by ivsmirnov on 16.06.2016.
+ * Помещение
  */
 public class Room {
 
@@ -10,65 +10,65 @@ public class Room {
     public static final int ACCESS_CLICK = 100;
     public static final int ACCESS_CARD = 101;
 
-    private String Name;
-    private int Status;
-    private int Access;
-    private long OpenTime;
-    private String UserName;
-    private String UserRadioLabel;
+    private String name;
+    private int status;
+    private int access;
+    private long openTime;
+    private String userName;
+    private String userRadioLabel;
 
     public Room setName (String name){
-        this.Name = name;
+        this.name = name;
         return this;
     }
 
     public Room setStatus (int status){
-        this.Status = status;
+        this.status = status;
         return this;
     }
 
     public Room setAccess (int access){
-        this.Access = access;
+        this.access = access;
         return this;
     }
 
     public Room setOpenTime(long openTime){
-        this.OpenTime = openTime;
+        this.openTime = openTime;
         return this;
     }
 
     public Room setUserName (String userName){
-        this.UserName = userName;
+        this.userName = userName;
         return this;
     }
 
     public Room setUserRadioLabel (String userRadioLabel){
-        this.UserRadioLabel = userRadioLabel;
+        this.userRadioLabel = userRadioLabel;
         return this;
     }
 
     public String getName(){
-        return Name;
+        return name;
     }
 
     public int getStatus(){
-        return Status;
+        return status;
     }
 
     public int getAccess(){
-        return Access;
+        return access;
     }
 
     public long getOpenTime(){
-        return OpenTime;
+        return openTime;
     }
 
     public String getUserName(){
-        return UserName;
+        return userName;
     }
 
     public String getUserRadioLabel(){
-        return UserRadioLabel;
+        return userRadioLabel;
     }
 
 }

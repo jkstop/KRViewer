@@ -5,7 +5,7 @@
     <item
         android:id="@id/menu_main_server_status"
         android:title="@string/menu_main_server_status"
-        android:icon="@drawable/ic_cloud_queue_black_24dp"
+        android:icon="@drawable/ic_cloud_outline_24dp"
         app:showAsAction = "ifRoom"/>
 
 </menu>

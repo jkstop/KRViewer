@@ -14,8 +14,8 @@ import com.squareup.picasso.Picasso;
 import java.io.File;
 
 import ru.jkstop.krviewer.R;
-import ru.jkstop.krviewer.SearchFragment;
-import ru.jkstop.krviewer.UsersFragment;
+import ru.jkstop.krviewer.fragments.SearchFragment;
+import ru.jkstop.krviewer.fragments.UsersFragment;
 import ru.jkstop.krviewer.databases.UsersDB;
 import ru.jkstop.krviewer.items.ImageSaver;
 
@@ -54,7 +54,7 @@ public class DialogUserPhoto extends DialogFragment {
 
         Toolbar toolbar = (Toolbar)dialogView.findViewById(R.id.user_photo_toolbar);
         toolbar.setTitle(userName);
-        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_24dp);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

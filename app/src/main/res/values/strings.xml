@@ -6,6 +6,8 @@
 
     <string name="navigation_head_account_log_off">Войти</string>
 
+    <string name="log_on">Войти</string>
+
     <string name="menu_navigation_rooms_load">Загруженность</string>
     <string name="menu_navigation_users">Пользователи</string>
     <string name="menu_navigation_send">Отправить журнал</string>
@@ -18,12 +20,31 @@
 
     <string name="title_dialog_log_out">Выход из аккаунта</string>
     <string name="title_dialog_sql_connect">Подключение к MSSQL</string>
+    <string name="title_dialog_user_photo">Фото пользователя</string>
 
     <string name="body_dialog_log_out">Выйти из аккаунта? Все загруженные данные будут удалены!</string>
 
     <string name="hint_sql_input_server_name">Сервер</string>
 
     <string name="input_empty_error">Введите хотя бы один символ!</string>
+
+    <string name="snack_success_synch">Успешно обновлено</string>
+    <string name="snack_error_synch">Ошибка при обновлении</string>
+    <string name="snack_no_server_connect">Нет подключения к серверу</string>
+    <string name="snack_no_wifi_connect">Нет подключения к FA_STAFF</string>
+    <string name="snack_settings">Настройки</string>
+
+    <string name="send_mail_subject">Журнал посещений</string>
+    <string name="send_mail_text">Отправлено из приложения KR Viewer</string>
+    <string name="send_mail_chooser">Выберите приложение</string>
+    <string name="send_mail_file_creating">Создание файла…</string>
+
+    <string name="server_read_loading">Загрузка…</string>
+    <string name="server_read_journal">Загрузка журнала</string>
+    <string name="server_read_users">Загрузка пользователей</string>
+    <string name="server_read_rooms">Загрузка помещений</string>
+
+    <string name="room_opened">Открыто</string>
 
 
 </resources>

@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/nav_header_height"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@drawable/navigation_splash"
+    android:background="@drawable/img_navigation_splash"
     android:gravity="bottom"
     android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
@@ -14,10 +14,10 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@id/account_image"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="@dimen/user_account_photo_width"
+        android:layout_height="@dimen/user_account_photo_height"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:src="@drawable/ic_account_circle_white_48dp" />
+        android:src="@drawable/ic_account_circle_48dp" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -34,7 +34,7 @@
 
         <android.support.v7.widget.AppCompatImageView
             android:id="@id/account_exit"
-            app:srcCompat="@drawable/ic_exit_to_app_white_24dp"
+            app:srcCompat="@drawable/ic_exit_24dp"
             android:clickable="true"
             android:layout_alignParentEnd="true"
             android:layout_alignBottom="@id/account_name"
@@ -44,8 +44,6 @@
             android:layout_height="wrap_content" />
 
     </RelativeLayout>
-
-
 
     <TextView
         android:id="@id/account_email"
