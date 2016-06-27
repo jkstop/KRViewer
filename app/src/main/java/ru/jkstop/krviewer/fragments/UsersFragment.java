@@ -89,7 +89,6 @@ public class UsersFragment extends Fragment implements RecyclerItemClickListener
 
         recycler.setAdapter(adapterUsersList);
         recycler.setLayoutManager(new GridLayoutManager(context, getResources().getInteger(R.integer.columns_users)));
-
         loadUsersTask().start();
 
         return fragmentView;

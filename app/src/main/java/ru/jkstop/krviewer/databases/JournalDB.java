@@ -13,6 +13,7 @@ import android.provider.BaseColumns;
 import java.io.File;
 import java.sql.Time;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
@@ -187,7 +188,7 @@ public class JournalDB extends SQLiteOpenHelper implements BaseColumns {
     }
 
     public static ArrayList<String> getDates(){
-        DateFormat dateFormat = DateFormat.getDateInstance();
+        DateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
         final ArrayList <String> items = new ArrayList<>();
         Cursor cursor = null;
         try {

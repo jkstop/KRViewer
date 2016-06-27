@@ -49,9 +49,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.net.URL;
 import java.sql.Connection;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -449,7 +452,10 @@ public class MainActivity extends AppCompatActivity implements
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
                 try {
-                    JournalFragment.loadJournalTask(new SimpleDateFormat("dd MMM yyyy", new Locale("RU", "ru")).parse(dates.get(position))).start();
+
+                    JournalFragment.loadJournalTask(new SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).parse(dates.get(position))).start();
+
+
                 } catch (ParseException e){
                     e.printStackTrace();
                 }
