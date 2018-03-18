@@ -1,5 +1,7 @@
 # KRViewer
 
+This project is not maintained anymore
+
 Приложение для просмотра состояния помещений Финансового университета при правительстве РФ
 
 ![alt tag](https://cloud.githubusercontent.com/assets/13080767/16266272/a120e04c-388c-11e6-989b-4709641863d1.png)
